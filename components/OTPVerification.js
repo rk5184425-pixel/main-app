@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-nativ
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
 import { signUp, sendOtp } from "../redux/services/operations/authServices";
+import Toast from "react-native-toast-message";
 
 const OTPVerification = ({ onBackToSignup, onVerificationComplete }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -28,17 +29,102 @@ const OTPVerification = ({ onBackToSignup, onVerificationComplete }) => {
     console.log('[OTP] Step 1: User entered OTP:', otpString);
     if (otpString.length === 4) {
       console.log('[OTP] Step 2: Dispatching signUp with data:', { ...signUpData, otp: otpString });
-      await dispatch(signUp({ ...signUpData, otp: otpString }));
-      console.log('[OTP] Step 3: Signup API call completed, redirecting to HomePage');
-      onVerificationComplete();
+      Toast.show({ type: "info", text1: "Verifying OTP..." });
+      const result = await dispatch(signUp({ ...signUpData, otp: otpString }));
+      console.log('[OTP] Step 3: Signup API call completed');
+      
+      // Check if there was an error in the response
+      if (result?.error) {
+        const errorMessage = result.error.toLowerCase();
+        
+        // Handle specific error cases
+        if (errorMessage.includes("user already exists") || errorMessage.includes("already registered")) {
+          Toast.show({
+            type: "error",
+            text1: "User already exists",
+            text2: "Please login instead"
+          });
+          
+          // Import router dynamically to avoid circular dependencies
+          const { router } = await import("expo-router");
+          router.replace("/"); // Navigate to login page
+          return;
+        }
+        
+        // Handle invalid OTP
+        if (errorMessage.includes("invalid otp") || errorMessage.includes("otp expired") || errorMessage.includes("incorrect otp")) {
+          Toast.show({
+            type: "error",
+            text1: "Invalid or expired OTP",
+            text2: "Please try again or request a new OTP"
+          });
+          return;
+        }
+        
+        // For other errors, just show the error message
+        Toast.show({
+          type: "error",
+          text1: "Verification failed",
+          text2: result.error
+        });
+        return;
+      }
+      
+      // Check if signup was successful by checking if token was set
+      const token = result?.payload?.token || result?.token;
+      if (token) {
+        console.log('[OTP] Step 4: Redirecting to Tabs page');
+        // Import router dynamically to avoid circular dependencies
+        const { router } = await import("expo-router");
+        router.push('/(tabs)');
+      } else {
+        // If no token was returned, still call the original callback
+        onVerificationComplete();
+      }
     } else {
       console.log('[OTP] Step 1b: OTP is not 4 digits, not verifying');
+      Toast.show({ type: "error", text1: "Please enter a valid 4-digit OTP" });
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (signUpData?.email) {
-      dispatch(sendOtp(signUpData.email));
+      Toast.show({ type: "info", text1: "Resending OTP..." });
+      const response = await dispatch(sendOtp(signUpData.email));
+      
+      // Handle errors from sendOtp
+      if (response?.error) {
+        const errorMessage = response.error.toLowerCase();
+        
+        // Handle user already exists error
+        if (errorMessage.includes("user already exists") || errorMessage.includes("already registered")) {
+          Toast.show({
+            type: "error",
+            text1: "User already exists",
+            text2: "Please login instead"
+          });
+          
+          // Import router dynamically to avoid circular dependencies
+          const { router } = await import("expo-router");
+          router.replace("/"); // Navigate to login page
+          return;
+        }
+        
+        // For other errors
+        Toast.show({
+          type: "error",
+          text1: "Failed to resend OTP",
+          text2: response.error
+        });
+      } else {
+        Toast.show({
+          type: "success",
+          text1: "OTP resent successfully",
+          text2: "Please check your email"
+        });
+      }
+    } else {
+      Toast.show({ type: "error", text1: "Email not found. Please go back to signup." });
     }
   };
 

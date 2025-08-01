@@ -3,9 +3,20 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFrameworkReady } from "../hooks/useFrameworkReady";
 import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
+import { Provider, useDispatch } from "react-redux";
+import store from "../redux/store";
+import { useEffect } from "react";
+import { initializeAuth } from "../redux/services/operations/initAuth";
 
-export default function RootLayout() {
+
+function MainLayout() {
   useFrameworkReady();
+  const dispatch = useDispatch();
+  
+  // Initialize auth state from AsyncStorage when app starts
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
 
   return (
     <ThemeProvider>
@@ -20,5 +31,13 @@ export default function RootLayout() {
         <StatusBar style="light" backgroundColor="#1a1a2e" />
       </GestureHandlerRootView>
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <MainLayout />
+    </Provider>
   );
 }

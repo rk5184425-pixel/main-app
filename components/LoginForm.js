@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/services/operations/authServices";
 import {
@@ -19,6 +19,17 @@ const LoginForm = ({ onSwitchToSignup, onForgotPassword, onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.auth?.loading);
+  const token = useSelector((state) => state.auth?.token);
+  
+  // Handle login success when token changes
+  useEffect(() => {
+    if (token) {
+      // Import router dynamically to avoid circular dependencies
+      import("expo-router").then(({ router }) => {
+        router.push('/(tabs)');
+      });
+    }
+  }, [token]);
 
   return (
     <View style={styles.container}>
@@ -100,9 +111,33 @@ const LoginForm = ({ onSwitchToSignup, onForgotPassword, onLoginSuccess }) => {
             return;
           }
           console.log("[LOGIN] Dispatching login with:", { email, password });
-          await dispatch(login(email, password));
-          const token = useSelector((state) => state.auth?.token);
-          if (token && onLoginSuccess) onLoginSuccess();
+          const response = await dispatch(login(email, password));
+          
+          // Handle specific error cases
+          if (response?.error) {
+            const errorMessage = response.error.toLowerCase();
+            
+            // If user doesn't exist, suggest signup
+            if (errorMessage.includes("user not found") || errorMessage.includes("no user") || errorMessage.includes("doesn't exist")) {
+              Toast.show({
+                type: "error",
+                text1: "User not found",
+                text2: "Please sign up first",
+                onPress: () => onSwitchToSignup()
+              });
+            }
+            // If password is incorrect
+            else if (errorMessage.includes("incorrect password") || errorMessage.includes("invalid password") || errorMessage.includes("wrong password")) {
+              Toast.show({
+                type: "error",
+                text1: "Incorrect password",
+                text2: "Please try again or reset your password",
+                onPress: () => onForgotPassword()
+              });
+            }
+            // Other errors are already handled by the Toast in the login function
+          }
+          // After login, onLoginSuccess will be called in useEffect when token changes
         }}
         disabled={loading}
       >

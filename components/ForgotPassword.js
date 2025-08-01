@@ -34,7 +34,7 @@ const ForgotPassword = ({ onBackToLogin, onOtpVerified }) => {
       {step === 1 && (
         <TouchableOpacity 
           style={styles.button}
-          onPress={() => {
+          onPress={async () => {
             if (!email) {
               Toast.show({ type: "error", text1: "Enter your email!" });
               return;
@@ -45,8 +45,37 @@ const ForgotPassword = ({ onBackToLogin, onOtpVerified }) => {
               return;
             }
             console.log('[FORGOT PASSWORD] Dispatching forgotPassword with:', { email });
-            dispatch(forgotPassword(email));
-            setStep(2);
+            const response = await dispatch(forgotPassword(email));
+            
+            // Handle errors from forgotPassword
+            if (response?.error) {
+              const errorMessage = response.error.toLowerCase();
+              
+              // Handle user not found error
+              if (errorMessage.includes("user not found") || errorMessage.includes("no user") || errorMessage.includes("doesn't exist")) {
+                Toast.show({
+                  type: "error",
+                  text1: "User not found",
+                  text2: "Please sign up first"
+                });
+                return;
+              }
+              
+              // For other errors
+              Toast.show({
+                type: "error",
+                text1: "Failed to send reset link",
+                text2: response.error
+              });
+            } else {
+              // Success case
+              Toast.show({
+                type: "success",
+                text1: "Reset link sent",
+                text2: "Please check your email"
+              });
+              setStep(2);
+            }
           }}
           disabled={loading}
         >
@@ -70,11 +99,55 @@ const ForgotPassword = ({ onBackToLogin, onOtpVerified }) => {
           </View>
           <TouchableOpacity 
             style={styles.button}
-            onPress={() => {
-              // In a real app, verify OTP with backend here
+            onPress={async () => {
+              if (!otp) {
+                Toast.show({ type: "error", text1: "Please enter the OTP" });
+                return;
+              }
+              
+              if (otp.length !== 4) {
+                Toast.show({ type: "error", text1: "OTP must be 4 digits" });
+                return;
+              }
+              
               console.log('[FORGOT PASSWORD] OTP entered:', otp);
-              if (onOtpVerified) onOtpVerified(email, otp);
+              
+              try {
+                // In a real app, verify OTP with backend here
+                if (onOtpVerified) {
+                  const response = await onOtpVerified(email, otp);
+                  
+                  // Handle errors from OTP verification
+                  if (response?.error) {
+                    const errorMessage = response.error.toLowerCase();
+                    
+                    // Handle invalid OTP
+                    if (errorMessage.includes("invalid otp") || errorMessage.includes("otp expired") || errorMessage.includes("incorrect otp")) {
+                      Toast.show({
+                        type: "error",
+                        text1: "Invalid or expired OTP",
+                        text2: "Please try again or request a new OTP"
+                      });
+                      return;
+                    }
+                    
+                    // For other errors
+                    Toast.show({
+                      type: "error",
+                      text1: "Verification failed",
+                      text2: response.error
+                    });
+                  }
+                }
+              } catch (error) {
+                Toast.show({
+                  type: "error",
+                  text1: "Verification failed",
+                  text2: error.message || "Please try again"
+                });
+              }
             }}
+            disabled={loading}
           >
             <Text style={styles.buttonText}>Verify OTP</Text>
           </TouchableOpacity>

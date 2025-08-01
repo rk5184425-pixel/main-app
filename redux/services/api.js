@@ -1,5 +1,17 @@
-// const BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL
-const BASE_URL = "http://192.168.56.63:5000/api";
+// Define a more reliable base URL configuration
+// For development on physical devices, use the IP address
+// For development on emulators, use 10.0.2.2 (Android) or localhost (iOS)
+// For production, use your deployed API URL
+
+// Check if we're running in development or production
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Use localhost for development and actual domain for production
+const BASE_URL = isDev 
+  ? "http://192.168.0.105:5000/api"  // Development - update this to your local IP
+  : "https://your-production-api.com/api"; // Production - update this when deploying
+
+console.log("API Base URL:", BASE_URL);
 
 // AUTHENTICATION API
 export const authApi = {

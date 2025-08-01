@@ -13,6 +13,17 @@ const ResetPassword = ({ onBackToLogin }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.auth?.loading);
+  const token = useSelector((state) => state.auth?.token);
+  
+  // Handle successful password reset
+  React.useEffect(() => {
+    if (token) {
+      // Import router dynamically to avoid circular dependencies
+      import("expo-router").then(({ router }) => {
+        router.push('/(tabs)');
+      });
+    }
+  }, [token]);
 
   return (
     <View style={styles.container}>
@@ -74,7 +85,7 @@ const ResetPassword = ({ onBackToLogin }) => {
       {/* Submit */}
       <TouchableOpacity 
         style={styles.button}
-        onPress={() => {
+        onPress={async () => {
           if (!resetToken) {
             Toast.show({ type: "error", text1: "Enter reset token!" });
             return;
@@ -96,7 +107,36 @@ const ResetPassword = ({ onBackToLogin }) => {
             return;
           }
           console.log('[RESET PASSWORD] Dispatching resetPassword with:', { newPassword, resetToken });
-          dispatch(resetPassword(newPassword, resetToken));
+          const response = await dispatch(resetPassword(newPassword, resetToken));
+          
+          // Handle errors from resetPassword
+          if (response?.error) {
+            const errorMessage = response.error.toLowerCase();
+            
+            // Handle invalid token error
+            if (errorMessage.includes("invalid token") || errorMessage.includes("token expired") || errorMessage.includes("invalid request")) {
+              Toast.show({
+                type: "error",
+                text1: "Invalid or expired token",
+                text2: "Please request a new reset link"
+              });
+              return;
+            }
+            
+            // For other errors
+            Toast.show({
+              type: "error",
+              text1: "Failed to reset password",
+              text2: response.error
+            });
+          } else {
+            // Success case is already handled by the useEffect watching for token changes
+            Toast.show({
+              type: "success",
+              text1: "Password reset successful",
+              text2: "You can now login with your new password"
+            });
+          }
         }}
         disabled={loading}
       >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,8 +25,37 @@ import {
   Shield,
   GraduationCap,
 } from "lucide-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
+import { setUser } from "../../redux/slices/profileSlices";
+import { router } from "expo-router";
 
 const ProfileScreen = () => {
+  const dispatch = useDispatch();
+  const userProfile = useSelector((state) => state.profile?.user);
+  const [userData, setUserData] = useState(null);
+  
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUserData(parsedUser);
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
+      }
+    };
+    
+    if (!userProfile) {
+      loadUserData();
+    } else {
+      setUserData(userProfile);
+    }
+  }, [userProfile]);
+  
   const userStats = {
     schemesExposed: 12,
     redFlagsSpotted: 45,
@@ -73,7 +103,25 @@ const ProfileScreen = () => {
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", onPress: () => {}, style: "destructive" },
+      { 
+        text: "Logout", 
+        onPress: async () => {
+          try {
+            // Clear AsyncStorage
+            await AsyncStorage.multiRemove(["token", "user"]);
+            
+            // Clear Redux state
+            dispatch(logout());
+            dispatch(setUser(null));
+            
+            // Navigate to login screen
+            router.replace("/");
+          } catch (error) {
+            console.error("Error during logout:", error);
+          }
+        }, 
+        style: "destructive" 
+      },
     ]);
   };
 
@@ -87,14 +135,24 @@ const ProfileScreen = () => {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.avatarContainer}>
-              <LinearGradient
-                colors={["#ff6b6b", "#4ecdc4"]}
-                style={styles.avatar}
-              >
-                <User size={40} color="white" />
-              </LinearGradient>
+              {userData?.avatar ? (
+                <Image 
+                  source={{ uri: userData.avatar }} 
+                  style={styles.avatar} 
+                  resizeMode="cover"
+                />
+              ) : (
+                <LinearGradient
+                  colors={["#ff6b6b", "#4ecdc4"]}
+                  style={styles.avatar}
+                >
+                  <User size={40} color="white" />
+                </LinearGradient>
+              )}
             </View>
-            <Text style={styles.userName}>Fraud Fighter</Text>
+            <Text style={styles.userName}>
+              {userData ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() : 'Fraud Fighter'}
+            </Text>
             <Text style={styles.userLevel}>{userStats.currentLevel}</Text>
           </View>
 

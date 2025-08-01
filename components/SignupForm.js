@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { sendOtp, signUp } from "../redux/services/operations/authServices";
@@ -24,14 +24,40 @@ const SignupForm = ({ onSignupSuccess }) => {
 
   // ✅ Send OTP
   const handleSendOtp = async () => {
-    if (!email) return Alert.alert("Error", "Enter email first!");
+    if (!firstName) return Toast.show({ type: "error", text1: "Enter your first name!" });
+    if (!lastName) return Toast.show({ type: "error", text1: "Enter your last name!" });
+    if (!email) return Toast.show({ type: "error", text1: "Enter your email!" });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return Toast.show({ type: "error", text1: "Enter a valid email address!" });
+    if (!password) return Toast.show({ type: "error", text1: "Enter your password!" });
+    if (password.length < 6) return Toast.show({ type: "error", text1: "Password must be at least 6 characters!" });
+    if (!confirmPassword) return Toast.show({ type: "error", text1: "Confirm your password!" });
+    if (password !== confirmPassword) return Toast.show({ type: "error", text1: "Passwords do not match!" });
+    if (!agreeToTerms) return Toast.show({ type: "error", text1: "You must agree to the terms!" });
     try {
-      console.log("Calling sendOtp with email:", email);
-      await dispatch(sendOtp(email)); // ✅ Correct way
-      Alert.alert("Success", "OTP sent successfully!");
+      setLoading(true);
+      const response = await dispatch(sendOtp(email));
+      setLoading(false);
+      
+      // Check if there was an error in the response
+      if (response?.error) {
+        const errorMessage = response.error;
+        if (errorMessage.includes("User already exists") || errorMessage.includes("already exists")) {
+          Toast.show({ 
+            type: "error", 
+            text1: "User already exists", 
+            text2: "Please go to login page",
+            onPress: () => onSwitchToLogin()
+          });
+          return;
+        } else {
+          Toast.show({ type: "error", text1: errorMessage || "Failed to send OTP" });
+          return;
+        }
+      }
+      
+      Toast.show({ type: "success", text1: "OTP sent successfully!" });
       setOtpSent(true);
-
-      // Store sign up data for final signup
       dispatch(
         setSignUpData({
           firstName,
@@ -40,27 +66,38 @@ const SignupForm = ({ onSignupSuccess }) => {
           password,
         })
       );
-      // Switch to OTP view
       if (onSignupSuccess) onSignupSuccess();
     } catch (error) {
-      Alert.alert("Error", "Failed to send OTP");
+      setLoading(false);
+      const errorMessage = error?.response?.data?.error || "Failed to send OTP";
+      
+      if (errorMessage.includes("User already exists") || errorMessage.includes("already exists")) {
+        Toast.show({ 
+          type: "error", 
+          text1: "User already exists", 
+          text2: "Please go to login page",
+          onPress: () => onSwitchToLogin()
+        });
+      } else {
+        Toast.show({ type: "error", text1: errorMessage });
+      }
     }
   };
 
   // ✅ Final Signup
   const handleSignup = async () => {
     if (password !== confirmPassword) {
-      return Alert.alert("Error", "Passwords do not match!");
+      return Toast.show({ type: "error", text1: "Passwords do not match!" });
     }
     if (!otp) {
-      return Alert.alert("Error", "Enter OTP before signup!");
+      return Toast.show({ type: "error", text1: "Enter OTP before signup!" });
     }
     try {
       const finalData = { firstName, lastName, email, password, otp };
       await dispatch(signUp(finalData)); // ✅ Fixed
-      Alert.alert("Success", "Signup successful!");
+      Toast.show({ type: "success", text1: "Signup successful!" });
     } catch (error) {
-      Alert.alert("Error", "Signup failed");
+      Toast.show({ type: "error", text1: "Signup failed" });
     }
   };
 
@@ -159,63 +196,13 @@ const SignupForm = ({ onSignupSuccess }) => {
             </Text>
           </View>
 
+          {/* Send OTP Button */}
           <TouchableOpacity
             style={styles.button}
-            onPress={async () => {
-              if (!firstName) {
-                Toast.show({ type: "error", text1: "Enter your first name!" });
-                return;
-              }
-              if (!lastName) {
-                Toast.show({ type: "error", text1: "Enter your last name!" });
-                return;
-              }
-              if (!email) {
-                Toast.show({ type: "error", text1: "Enter your email!" });
-                return;
-              }
-              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              if (!emailRegex.test(email)) {
-                Toast.show({ type: "error", text1: "Enter a valid email address!" });
-                return;
-              }
-              if (!password) {
-                Toast.show({ type: "error", text1: "Enter your password!" });
-                return;
-              }
-              if (password.length < 6) {
-                Toast.show({ type: "error", text1: "Password must be at least 6 characters!" });
-                return;
-              }
-              if (!confirmPassword) {
-                Toast.show({ type: "error", text1: "Confirm your password!" });
-                return;
-              }
-              if (password !== confirmPassword) {
-                Toast.show({ type: "error", text1: "Passwords do not match!" });
-                return;
-              }
-              if (!otp) {
-                Toast.show({ type: "error", text1: "Enter OTP before signup!" });
-                return;
-              }
-              if (!agreeToTerms) {
-                Toast.show({ type: "error", text1: "You must agree to the terms!" });
-                return;
-              }
-              setLoading(true);
-              try {
-                await dispatch(signUp({ firstName, lastName, email, password, otp }));
-                Alert.alert("Success", "Signup successful!");
-              } catch (error) {
-                Alert.alert("Error", "Signup failed");
-              } finally {
-                setLoading(false);
-              }
-            }}
+            onPress={handleSendOtp}
             disabled={loading}
           >
-            <Text style={styles.buttonText}>{loading ? 'Signing Up...' : 'Sign Up'}</Text>
+            <Text style={styles.buttonText}>{loading ? 'Sending OTP...' : 'Send OTP'}</Text>
           </TouchableOpacity>
         </>
       ) : (
