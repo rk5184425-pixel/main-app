@@ -57,13 +57,12 @@ const simulatorModules: SimulatorModule[] = [
   },
 
   {
-    id: "risk-assessment",
-    title: "Risk Assessment & Management",
-    description:
-      "Evaluate and manage financial risks using quantitative models",
+    id: "sip-calculator",
+    title: "SIP Calculator",
+    description: "Calculate your SIP returns with ease",
     icon: BarChart3,
     category: "financial",
-    route: "/simulators/risk-assessment",
+    route: "/pages/SipTool",
   },
   {
     id: "market-analysis",

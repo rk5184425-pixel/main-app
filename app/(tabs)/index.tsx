@@ -141,16 +141,13 @@ const HomeScreen = () => {
                     colors={[feature.color, `${feature.color}CC`]}
                     style={styles.featureGradient}
                   >
-                    <feature.icon size={32} color="white" />
-                    <Text
-                      style={[
-                        { color: theme.colors.text },
-                        styles.featureTitle,
-                      ]}
-                    >
+                    <feature.icon size={32} color="black" />
+                    <Text style={[styles.featureTitle, { color: "black" }]}>
                       {feature.title}
                     </Text>
-                    <Text style={styles.featureDescription}>
+                    <Text
+                      style={[styles.featureDescription, { color: "black" }]}
+                    >
                       {feature.description}
                     </Text>
                   </LinearGradient>

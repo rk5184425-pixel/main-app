@@ -22,6 +22,7 @@ import {
 } from "lucide-react-native";
 import { useTheme } from "../../contexts/ThemeContext";
 import { router } from "expo-router";
+import LessonsPage from "../pages/LessonsPage";
 
 const EducationScreen = () => {
   const { theme } = useTheme();
@@ -302,42 +303,7 @@ const EducationScreen = () => {
     </View>
   );
 
-  const renderTips = () => (
-    <View>
-      {tips.map((tip, index) => (
-        <View
-          key={index}
-          style={[
-            styles.tipCard,
-            {
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              borderWidth: 0.4,
-            },
-          ]}
-        >
-          <View style={styles.tipHeader}>
-            {typeof tip.icon === "string" ? (
-              <Text style={styles.tipIconText}>{tip.icon}</Text>
-            ) : (
-              <tip.icon size={24} color="#4ecdc4" />
-            )}
-            <Text style={[styles.tipTitle, { color: theme.colors.text }]}>
-              {tip.title}
-            </Text>
-          </View>
-          <Text
-            style={[
-              styles.tipDescription,
-              { color: theme.colors.textSecondary },
-            ]}
-          >
-            {tip.description}
-          </Text>
-        </View>
-      ))}
-    </View>
-  );
+  const renderTips = () => <LessonsPage />;
 
   const renderResources = () => (
     <View>

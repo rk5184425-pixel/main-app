@@ -1,4 +1,4 @@
-export const BACKEND_URL = "http://192.168.16.103:5000";
+export const BACKEND_URL = "https://finguard-server.onrender.com";
 
 export async function checkBackendConnection() {
   try {
@@ -14,4 +14,4 @@ export async function checkBackendConnection() {
     console.log("❌ Backend not connected (network error)");
     return false;
   }
-} 
+}
