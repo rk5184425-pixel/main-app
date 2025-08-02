@@ -20,7 +20,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 import { router } from "expo-router";
 import LessonsPage from "../pages/LessonsPage";
 

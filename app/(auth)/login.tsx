@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import LoginForm from "../../components/LoginForm";
 import { useAuth } from "../../contexts/AuthContext";
 import { router } from "expo-router";
+import ChatbotButton from "../../components/ChatbotButton";
+import ChatbotPopup from "../../components/ChatbotPopup";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
+  const [isPopupVisible, setPopupVisible] = useState(false);
 
   const handleLoginSuccess = () => {
     signIn();
@@ -25,7 +28,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Ionicons name="shield-checkmark" size={40} color="#151717" />
@@ -41,6 +44,14 @@ export default function LoginScreen() {
           onLoginSuccess={handleLoginSuccess}
         />
       </View>
+      {/* Floating Chatbot Button */}
+      <ChatbotButton onPress={() => setPopupVisible(true)} />
+
+      {/* Popup */}
+      <ChatbotPopup
+        visible={isPopupVisible}
+        onClose={() => setPopupVisible(false)}
+      />
     </View>
   );
 }

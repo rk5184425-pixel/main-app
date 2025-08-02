@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
-import { PonziTreeVisualization } from "../../components/PonziTreeVisualization";
+import { PonziTreeVisualization } from "../../../components/PonziTreeVisualization";
 import {
   Users,
   DollarSign,
@@ -24,7 +24,7 @@ import {
   Pause,
   RotateCcw,
 } from "lucide-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 interface Investor {
   id: number;

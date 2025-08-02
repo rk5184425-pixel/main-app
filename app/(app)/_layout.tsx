@@ -8,9 +8,16 @@ export default function AppLayout() {
   // Show loading screen while checking authentication
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1a2e' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1a1a2e",
+        }}
+      >
         <ActivityIndicator size="large" color="#ff6b6b" />
-        <Text style={{ color: 'white', marginTop: 10 }}>Loading...</Text>
+        <Text style={{ color: "white", marginTop: 10 }}>Loading...</Text>
       </View>
     );
   }
@@ -24,7 +31,7 @@ export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="pages" />
+      {/* <Stack.Screen name="pages" /> */}
     </Stack>
   );
 }

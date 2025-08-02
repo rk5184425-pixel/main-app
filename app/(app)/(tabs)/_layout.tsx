@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { Home, Brain, BookOpen, User, Wrench } from "lucide-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export default function TabLayout() {
   const { theme } = useTheme();

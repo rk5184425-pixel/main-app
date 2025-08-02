@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter, useSegments } from 'expo-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { initializeAuth } from '../redux/services/operations/initAuth';
-import { logout } from '../redux/services/operations/authServices';
-import { setUser } from '../redux/slices/profileSlices';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter, useSegments } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { initializeAuth } from "../redux/services/operations/initAuth";
+import { logout } from "../redux/services/operations/authServices";
+import { setUser } from "../redux/slices/profileSlices";
+import AsyncStorageService, { STORAGE_KEYS } from "../utils/AsyncStorage";
 
 interface AuthContextType {
   signIn: () => void;
@@ -17,7 +18,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -27,9 +28,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const dispatch = useDispatch();
-  
+
   // Get authentication state from Redux
-  const token = useSelector((state: any) => state.auth.token);
+  let token = useSelector((state: any) => state.auth.token);
   const isAuthenticated = !!token;
 
   // Initialize auth state on app start
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true);
         await dispatch(initializeAuth() as any);
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
+        console.error("Failed to initialize auth:", error);
       } finally {
         setIsLoading(false);
       }
@@ -52,14 +53,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect to auth if not authenticated and not in auth group
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
     } else if (isAuthenticated && inAuthGroup) {
       // Redirect to app if authenticated and in auth group
-      router.replace('/(app)/(tabs)');
+      router.replace("/(app)/(tabs)");
     }
   }, [isAuthenticated, segments, isLoading]);
 
@@ -72,13 +73,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const result = await dispatch(logout() as any);
-      
+
       if (result.success) {
         dispatch(setUser(null));
         // Navigation will be handled by useEffect
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setIsLoading(false);
     }

@@ -19,13 +19,13 @@ import {
   CircleCheck as CheckCircle,
   TriangleAlert as AlertTriangle,
 } from "lucide-react-native";
-import SMSSimulation from "../../components/SMSSimulation";
-import EmailSimulation from "../../components/EmailSimulation";
-import PhishingPage from "../../components/PhishingPage";
-import EducationalWarning from "../../components/EducationalWarning";
-import DebitSimulation from "../../components/DebitSimulation";
-import QuizSimulation from "../../components/QuizSimulation";
-import SecurityTips from "../../components/SecurityTips";
+import SMSSimulation from "../../../components/SMSSimulation";
+import EmailSimulation from "../../../components/EmailSimulation";
+import PhishingPage from "../../../components/PhishingPage";
+import EducationalWarning from "../../../components/EducationalWarning";
+import DebitSimulation from "../../../components/DebitSimulation";
+import QuizSimulation from "../../../components/QuizSimulation";
+import SecurityTips from "../../../components/SecurityTips";
 import { router } from "expo-router";
 
 type Step =

@@ -1,10 +1,10 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LessonViewer } from "../../components/LessonViewer";
-import type { Lesson, Course } from "../../types/lesson"; // Adjust the import path as needed
+import { LessonViewer } from "../../../components/LessonViewer";
+import type { Lesson, Course } from "../../../types/lesson"; // Adjust the import path as needed
 import { useLocalSearchParams } from "expo-router";
 import { goBack } from "expo-router/build/global-state/routing";
-import { courses } from "../../data/lessons";
+import { courses } from "../../../data/lessons";
 import { useState } from "react";
 
 export default function Lesson() {

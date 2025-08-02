@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { router } from "expo-router";
 import {
   View,
@@ -30,6 +30,8 @@ import {
   Target,
   Award,
 } from "lucide-react-native";
+import ChatbotButton from "../../../components/ChatbotButton";
+import ChatbotPopup from "../../../components/ChatbotPopup";
 
 const { width, height } = Dimensions.get("window");
 
@@ -221,6 +223,7 @@ const CategoryHeader: React.FC<{
 );
 
 export default function SimulatorsScreen() {
+  const [isPopupVisible, setPopupVisible] = useState(false);
   const fraudModules = simulatorModules.filter((m) => m.category === "fraud");
   const financialModules = simulatorModules.filter(
     (m) => m.category === "financial"
@@ -297,6 +300,14 @@ export default function SimulatorsScreen() {
           </View>
         </View>
       </ScrollView>
+      {/* Floating Chatbot Button */}
+      <ChatbotButton onPress={() => setPopupVisible(true)} />
+
+      {/* Popup */}
+      <ChatbotPopup
+        visible={isPopupVisible}
+        onClose={() => setPopupVisible(false)}
+      />
     </View>
   );
 }

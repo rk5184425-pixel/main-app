@@ -1,9 +1,9 @@
 import React from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { DocHashVerifier } from "../../components/DocHashVerifier";
+import { DocHashVerifier } from "../../../components/DocHashVerifier";
 
-export default function Index() {
+export default function DocHashVerifierTool() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>

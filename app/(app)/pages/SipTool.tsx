@@ -1,9 +1,9 @@
 import React from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { SipCalculator } from "../../components/SipCalculator";
+import { SipCalculator } from "../../../components/SipCalculator";
 
-export default function Index() {
+export default function SipTool() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView

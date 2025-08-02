@@ -20,10 +20,10 @@ import {
   BookOpen,
   Clock,
 } from "lucide-react-native";
-import { CourseCard } from "../../components/CourseCard";
-import { LessonViewer } from "../../components/LessonViewer";
-import { courses } from "../../data/lessons";
-import { Course, Lesson, Progress } from "../../types/lesson";
+import { CourseCard } from "../../../components/CourseCard";
+import { LessonViewer } from "../../../components/LessonViewer";
+import { courses } from "../../../data/lessons";
+import { Course, Lesson, Progress } from "../../../types/lesson";
 import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");

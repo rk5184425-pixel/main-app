@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -19,13 +19,16 @@ import {
   Shield,
   TrendingUp,
 } from "lucide-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
-import ThemeToggle from "../../components/ThemeToggle";
+import { useTheme } from "../../../contexts/ThemeContext";
+import ThemeToggle from "../../../components/ThemeToggle";
+import ChatbotButton from "../../../components/ChatbotButton";
+import ChatbotPopup from "../../../components/ChatbotPopup";
 
 const { width } = Dimensions.get("window");
 
 const HomeScreen = () => {
   const { theme, toggleTheme } = useTheme();
+  const [isPopupVisible, setPopupVisible] = useState(false);
   const features = [
     {
       id: 1,
@@ -185,6 +188,14 @@ const HomeScreen = () => {
             </View>
           </View>
         </ScrollView>
+        {/* Floating Chatbot Button */}
+        <ChatbotButton onPress={() => setPopupVisible(true)} />
+
+        {/* Popup */}
+        <ChatbotPopup
+          visible={isPopupVisible}
+          onClose={() => setPopupVisible(false)}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

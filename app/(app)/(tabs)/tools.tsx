@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { router } from "expo-router";
 import {
   View,
@@ -25,6 +25,8 @@ import {
   File,
   Link,
 } from "lucide-react-native";
+import ChatbotButton from "../../../components/ChatbotButton";
+import ChatbotPopup from "../../../components/ChatbotPopup";
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,22 +67,28 @@ const simulatorModules: SimulatorModule[] = [
     route: "/pages/SipTool",
   },
   {
-    id: "market-analysis",
-    title: "Market Trend Analysis",
-    description:
-      "Analyze market trends and make data-driven investment decisions",
+    id: "fd-rd-calculator",
+    title: "FD & RD Calculator",
+    description: "Calculate your FD & RD returns with ease",
     icon: TrendingUp,
     category: "financial",
-    route: "/simulators/market-analysis",
+    route: "/pages/FdAndRdCalculator",
   },
   {
-    id: "loan-calculator",
-    title: "Advanced Loan Modeling",
-    description:
-      "Create sophisticated loan models with risk assessment capabilities",
+    id: "interest-emi-calculator",
+    title: "Interest & EMI Calculator",
+    description: "Calculate your interest & EMI with ease",
     icon: Calculator,
     category: "financial",
-    route: "/simulators/loan-calculator",
+    route: "/pages/InterestCalculator",
+  },
+  {
+    id: "tax-calculator",
+    title: "Tax Calculator",
+    description: "Calculate your tax with ease",
+    icon: BarChart3,
+    category: "financial",
+    route: "/pages/TaxCalculator",
   },
 ];
 
@@ -143,6 +151,7 @@ const CategoryHeader: React.FC<{
 );
 
 export default function SimulatorsScreen() {
+  const [isPopupVisible, setPopupVisible] = useState(false);
   const fraudModules = simulatorModules.filter((m) => m.category === "fraud");
   const financialModules = simulatorModules.filter(
     (m) => m.category === "financial"
@@ -204,6 +213,14 @@ export default function SimulatorsScreen() {
           </View>
         </View>
       </ScrollView>
+      {/* Floating Chatbot Button */}
+      <ChatbotButton onPress={() => setPopupVisible(true)} />
+
+      {/* Popup */}
+      <ChatbotPopup
+        visible={isPopupVisible}
+        onClose={() => setPopupVisible(false)}
+      />
     </View>
   );
 }

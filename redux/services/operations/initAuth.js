@@ -9,20 +9,23 @@ import { setUser } from "../../slices/profileSlices";
 export const initializeAuth = () => async (dispatch) => {
   try {
     console.log("Initializing auth from AsyncStorage...");
-    
+
     // Get token from AsyncStorage
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem("user_token");
     console.log("Token from AsyncStorage:", token ? "Found" : "Not found");
-    
-    const userString = await AsyncStorage.getItem("user");
-    console.log("User data from AsyncStorage:", userString ? "Found" : "Not found");
-    
+
+    const userString = await AsyncStorage.getItem("user_profile");
+    console.log(
+      "User data from AsyncStorage:",
+      userString ? "Found" : "Not found"
+    );
+
     if (token) {
       // Parse token if it was stored as JSON string
-      const parsedToken = token.startsWith('{') ? JSON.parse(token) : token;
+      const parsedToken = token.startsWith("{") ? JSON.parse(token) : token;
       console.log("Setting token in Redux store");
       dispatch(setToken(parsedToken));
-      
+
       // If we also have user data, set it in Redux
       if (userString) {
         const user = JSON.parse(userString);
@@ -31,7 +34,7 @@ export const initializeAuth = () => async (dispatch) => {
       } else {
         console.log("No user data found in AsyncStorage");
       }
-      
+
       console.log("Auth successfully initialized from AsyncStorage");
       return { success: true };
     } else {
@@ -41,6 +44,6 @@ export const initializeAuth = () => async (dispatch) => {
     console.error("Failed to initialize auth from AsyncStorage:", error);
     return { error: "Failed to initialize auth" };
   }
-  
+
   return { success: false };
 };

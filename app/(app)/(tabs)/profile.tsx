@@ -36,7 +36,7 @@ const ProfileScreen = () => {
   const { signOut } = useAuth();
   const userProfile = useSelector((state: any) => state.profile?.user);
   const [userData, setUserData] = useState(null);
-  
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -49,14 +49,14 @@ const ProfileScreen = () => {
         console.error("Error loading user data:", error);
       }
     };
-    
+
     if (!userProfile) {
       loadUserData();
     } else {
       setUserData(userProfile);
     }
   }, [userProfile]);
-  
+
   const userStats = {
     schemesExposed: 12,
     redFlagsSpotted: 45,
@@ -104,21 +104,21 @@ const ProfileScreen = () => {
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { 
-        text: "Logout", 
+      {
+        text: "Logout",
         onPress: async () => {
           try {
             // Clear user state
             dispatch(setUser(null));
-            
+
             // Use the auth context logout
             await signOut();
             // Navigation will be handled by AuthProvider
           } catch (error) {
             console.error("Error during logout:", error);
           }
-        }, 
-        style: "destructive" 
+        },
+        style: "destructive",
       },
     ]);
   };
@@ -134,9 +134,9 @@ const ProfileScreen = () => {
           <View style={styles.header}>
             <View style={styles.avatarContainer}>
               {userData?.avatar ? (
-                <Image 
-                  source={{ uri: userData.avatar }} 
-                  style={styles.avatar} 
+                <Image
+                  source={{ uri: userData.avatar }}
+                  style={styles.avatar}
                   resizeMode="cover"
                 />
               ) : (
@@ -149,7 +149,11 @@ const ProfileScreen = () => {
               )}
             </View>
             <Text style={styles.userName}>
-              {userData ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() : 'Fraud Fighter'}
+              {userData
+                ? `${userData.firstName || ""} ${
+                    userData.lastName || ""
+                  }`.trim()
+                : "Fraud Fighter"}
             </Text>
             <Text style={styles.userLevel}>{userStats.currentLevel}</Text>
           </View>
@@ -287,7 +291,10 @@ const ProfileScreen = () => {
               <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.settingItem}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => router.push("/pages/LearnScreen")}
+            >
               <HelpCircle size={24} color="#96ceb4" />
               <Text style={styles.settingText}>Help & Support</Text>
               <Text style={styles.chevron}>›</Text>
