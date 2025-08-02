@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import LoginForm from "../../components/LoginForm";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import { router } from "expo-router";
 import ChatbotButton from "../../components/ChatbotButton";
 import ChatbotPopup from "../../components/ChatbotPopup";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
+  const { theme } = useTheme();
   const [isPopupVisible, setPopupVisible] = useState(false);
 
   const handleLoginSuccess = () => {
@@ -26,14 +29,25 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={theme.colors.background.gradient}
+      style={styles.container}
+    >
       <StatusBar style="auto" />
 
       {/* Header */}
-      <View style={styles.header}>
-        <Ionicons name="shield-checkmark" size={40} color="#151717" />
-        <Text style={styles.appTitle}>FinEduGuard</Text>
-        <Text style={styles.appSubtitle}>Secure Financial Education</Text>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface.primary }]}>
+        <Ionicons 
+          name="shield-checkmark" 
+          size={48} 
+          color={theme.colors.brand.primary} 
+        />
+        <Text style={[styles.appTitle, { color: theme.colors.text.primary }]}>
+          FinEduGuard
+        </Text>
+        <Text style={[styles.appSubtitle, { color: theme.colors.text.secondary }]}>
+          Secure Financial Education
+        </Text>
       </View>
 
       {/* Form Container */}
@@ -44,6 +58,7 @@ export default function LoginScreen() {
           onLoginSuccess={handleLoginSuccess}
         />
       </View>
+      
       {/* Floating Chatbot Button */}
       <ChatbotButton onPress={() => setPopupVisible(true)} />
 
@@ -52,35 +67,41 @@ export default function LoginScreen() {
         visible={isPopupVisible}
         onClose={() => setPopupVisible(false)}
       />
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   header: {
     alignItems: "center",
     paddingTop: 60,
-    paddingBottom: 30,
-    backgroundColor: "#fff",
+    paddingBottom: 40,
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   appTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
-    color: "#151717",
-    marginTop: 10,
+    marginTop: 16,
+    letterSpacing: -0.5,
   },
   appSubtitle: {
     fontSize: 16,
-    color: "#666",
-    marginTop: 5,
+    marginTop: 8,
+    opacity: 0.8,
   },
   formContainer: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 32,
   },
 });

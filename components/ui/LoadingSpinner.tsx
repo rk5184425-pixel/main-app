@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
   interpolate,
 } from "react-native-reanimated";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface LoadingSpinnerProps {
   size?: number;
@@ -16,10 +17,13 @@ interface LoadingSpinnerProps {
 
 export function LoadingSpinner({
   size = 24,
-  color = "#10b981",
+  color,
   style,
 }: LoadingSpinnerProps) {
+  const { theme } = useTheme();
   const rotation = useSharedValue(0);
+  
+  const spinnerColor = color || theme.colors.brand.primary;
 
   useEffect(() => {
     rotation.value = withRepeat(withTiming(360, { duration: 1000 }), -1, false);
@@ -38,8 +42,8 @@ export function LoadingSpinner({
           {
             width: size,
             height: size,
-            borderColor: `${color}20`,
-            borderTopColor: color,
+            borderColor: `${spinnerColor}20`,
+            borderTopColor: spinnerColor,
           },
         ]}
       />

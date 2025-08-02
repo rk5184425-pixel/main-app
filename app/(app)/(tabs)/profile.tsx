@@ -28,12 +28,15 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "../../../contexts/AuthContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 import { setUser } from "../../../redux/slices/profileSlices";
 import { router } from "expo-router";
+import ThemeToggle from "../../../components/ThemeToggle";
 
 const ProfileScreen = () => {
   const dispatch = useDispatch();
   const { signOut } = useAuth();
+  const { theme } = useTheme();
   const userProfile = useSelector((state: any) => state.profile?.user);
   const [userData, setUserData] = useState(null);
 
