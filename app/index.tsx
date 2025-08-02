@@ -17,6 +17,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
 import { initializeAuth } from "../redux/services/operations/initAuth";
+import { logout } from "../redux/services/operations/authServices";
 import AsyncStorageService, { STORAGE_KEYS } from "../utils/AsyncStorage";
 import { router } from "expo-router";
 
@@ -66,8 +67,11 @@ function AppContent() {
       setIsLoggedIn(true);
       router.push('/(tabs)');
     } else if (!token && isLoggedIn) {
+      console.log("🚪 Token cleared, user logged out - showing home screen");
       setIsLoggedIn(false);
       setCurrentView("home");
+      // Ensure we're on the index route after logout
+      router.replace('/');
     }
   }, [token, isLoggedIn]);
 
@@ -86,12 +90,14 @@ function AppContent() {
   
   const handleLogout = async () => {
     try {
-      await AsyncStorageService.removeItem(STORAGE_KEYS.USER_TOKEN);
-      await AsyncStorageService.removeItem(STORAGE_KEYS.USER_PROFILE);
-      await AsyncStorageService.removeItem(STORAGE_KEYS.LAST_LOGIN);
-      setIsLoggedIn(false);
-      setCurrentView("home");
-      console.log("🚪 User logged out successfully");
+      // Use the centralized logout service
+      const result = await dispatch(logout() as any);
+      
+      if (result.success) {
+        setIsLoggedIn(false);
+        setCurrentView("home");
+        console.log("🚪 User logged out successfully");
+      }
     } catch (error) {
       console.error("Error during logout:", error);
     }

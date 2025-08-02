@@ -15,7 +15,7 @@ function MainLayout() {
   
   // Initialize auth state from AsyncStorage when app starts
   useEffect(() => {
-    dispatch(initializeAuth());
+    dispatch(initializeAuth() as any);
   }, [dispatch]);
 
   return (

@@ -27,13 +27,13 @@ import {
 } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/slices/authSlice";
+import { logout } from "../../redux/services/operations/authServices";
 import { setUser } from "../../redux/slices/profileSlices";
 import { router } from "expo-router";
 
 const ProfileScreen = () => {
   const dispatch = useDispatch();
-  const userProfile = useSelector((state) => state.profile?.user);
+  const userProfile = useSelector((state: any) => state.profile?.user);
   const [userData, setUserData] = useState(null);
   
   useEffect(() => {
@@ -107,15 +107,19 @@ const ProfileScreen = () => {
         text: "Logout", 
         onPress: async () => {
           try {
-            // Clear AsyncStorage
-            await AsyncStorage.multiRemove(["token", "user"]);
+            // Use the centralized logout service
+            const result = await dispatch(logout() as any);
             
-            // Clear Redux state
-            dispatch(logout());
-            dispatch(setUser(null));
-            
-            // Navigate to login screen
-            router.replace("/");
+            if (result.success) {
+              // Clear user state
+              dispatch(setUser(null));
+              
+              // Small delay to ensure state is properly cleared
+              setTimeout(() => {
+                // Navigate to login screen
+                router.replace("/");
+              }, 100);
+            }
           } catch (error) {
             console.error("Error during logout:", error);
           }
