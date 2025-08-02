@@ -1,115 +1,90 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
+import React from "react";
+import { View, ViewStyle } from "react-native";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
   withTiming,
-  withSpring,
-  interpolateColor,
+  Easing,
 } from "react-native-reanimated";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface ProgressProps {
-  value: number;
-  style?: any;
-  variant?: "default" | "success" | "warning" | "danger";
+  value: number; // 0-100
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "success" | "warning" | "error";
+  showLabel?: boolean;
+  animated?: boolean;
+  style?: ViewStyle;
 }
 
-export function Progress({ value, style, variant = "default" }: ProgressProps) {
-  const progressValue = Math.min(100, Math.max(0, value));
-  const animatedWidth = useSharedValue(0);
-  const glowOpacity = useSharedValue(0);
+export function Progress({
+  value,
+  size = "md",
+  variant = "default",
+  showLabel = false,
+  animated = true,
+  style,
+}: ProgressProps) {
+  const { theme } = useTheme();
+  const progress = useSharedValue(0);
 
-  useEffect(() => {
-    animatedWidth.value = withSpring(progressValue, {
-      damping: 15,
-      stiffness: 100,
-    });
-
-    if (progressValue > 0) {
-      glowOpacity.value = withTiming(1, { duration: 300 });
+  React.useEffect(() => {
+    const clampedValue = Math.max(0, Math.min(100, value));
+    if (animated) {
+      progress.value = withTiming(clampedValue / 100, {
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      progress.value = clampedValue / 100;
     }
-  }, [progressValue]);
+  }, [value, animated]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    width: `${animatedWidth.value}%`,
-  }));
-
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
-  }));
-
-  const getProgressColor = () => {
-    switch (variant) {
-      case "success":
-        return "#10b981";
-      case "warning":
-        return "#f59e0b";
-      case "danger":
-        return "#ef4444";
-      default:
-        return "#3b82f6";
+  const getSizeStyles = () => {
+    switch (size) {
+      case "sm":
+        return { height: 4, borderRadius: 2 };
+      case "lg":
+        return { height: 12, borderRadius: 6 };
+      default: // md
+        return { height: 8, borderRadius: 4 };
     }
   };
 
-  const getGlowColor = () => {
+  const getVariantColor = () => {
     switch (variant) {
       case "success":
-        return "rgba(16, 185, 129, 0.4)";
+        return theme.colors.success;
       case "warning":
-        return "rgba(245, 158, 11, 0.4)";
-      case "danger":
-        return "rgba(239, 68, 68, 0.4)";
+        return theme.colors.warning;
+      case "error":
+        return theme.colors.error;
       default:
-        return "rgba(59, 130, 246, 0.4)";
+        return theme.colors.primary;
     }
+  };
+
+  const containerStyle: ViewStyle = {
+    backgroundColor: theme.colors.muted,
+    overflow: "hidden",
+    ...getSizeStyles(),
+  };
+
+  const progressAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      width: `${progress.value * 100}%`,
+    };
+  });
+
+  const progressBarStyle: ViewStyle = {
+    height: "100%",
+    backgroundColor: getVariantColor(),
+    borderRadius: getSizeStyles().borderRadius,
   };
 
   return (
-    <View style={[styles.container, style]}>
-      <Animated.View
-        style={[
-          styles.progress,
-          animatedStyle,
-          { backgroundColor: getProgressColor() },
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.glow,
-          glowStyle,
-          {
-            backgroundColor: getGlowColor(),
-            width: `${progressValue}%`,
-          },
-        ]}
-      />
+    <View style={[containerStyle, style]}>
+      <Animated.View style={[progressBarStyle, progressAnimatedStyle]} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    height: 8,
-    width: "100%",
-    backgroundColor: "#374151",
-    borderRadius: 8,
-    overflow: "hidden",
-    position: "relative",
-  },
-  progress: {
-    height: "100%",
-    borderRadius: 8,
-    position: "absolute",
-    left: 0,
-    top: 0,
-  },
-  glow: {
-    height: "100%",
-    borderRadius: 8,
-    position: "absolute",
-    left: 0,
-    top: 0,
-    shadowRadius: 8,
-    shadowOpacity: 0.8,
-  },
-});

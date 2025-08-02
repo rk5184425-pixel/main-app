@@ -1,49 +1,87 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  interpolateColor,
+  useDerivedValue,
+} from "react-native-reanimated";
 import { useTheme } from "../contexts/ThemeContext";
 import { Moon, Sun } from "lucide-react-native";
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  
+  const progress = useSharedValue(theme.isDark ? 1 : 0);
+  
+  React.useEffect(() => {
+    progress.value = withSpring(theme.isDark ? 1 : 0, {
+      damping: 15,
+      stiffness: 150,
+    });
+  }, [theme.isDark]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      progress.value,
+      [0, 1],
+      [theme.colors.card, theme.colors.card]
+    );
+    
+    const borderColor = interpolateColor(
+      progress.value,
+      [0, 1],
+      [theme.colors.border, theme.colors.border]
+    );
+
+    return {
+      backgroundColor,
+      borderColor,
+      transform: [{ scale: withSpring(1) }],
+    };
+  });
+
+  const iconAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${progress.value * 180}deg` },
+        { scale: withSpring(0.9 + progress.value * 0.1) }
+      ],
+    };
+  });
 
   return (
-    <TouchableOpacity
+    <AnimatedTouchableOpacity
       style={[
         styles.toggleButton,
-        {
-          backgroundColor: theme.colors.card,
-          borderColor: theme.colors.border,
-        },
+        animatedStyle,
+        theme.shadows.md,
       ]}
       onPress={toggleTheme}
+      activeOpacity={0.8}
     >
-      <Text style={[styles.toggleText, { color: theme.colors.text }]}>
+      <Animated.View style={iconAnimatedStyle}>
         {theme.isDark ? (
-          <Moon size={24} color="white" />
+          <Moon size={24} color={theme.colors.primary} />
         ) : (
-          <Sun size={24} color="orange" />
+          <Sun size={24} color={theme.colors.warning} />
         )}
-      </Text>
-    </TouchableOpacity>
+      </Animated.View>
+    </AnimatedTouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   toggleButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  toggleText: {
-    fontSize: 20,
   },
 });
 

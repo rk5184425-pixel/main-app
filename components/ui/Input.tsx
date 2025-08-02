@@ -1,65 +1,85 @@
 import React from "react";
-import { TextInput, View, Text, StyleSheet } from "react-native";
+import { TextInput, TextInputProps, ViewStyle, TextStyle } from "react-native";
+import { useTheme } from "../../contexts/ThemeContext";
 
-interface InputProps {
-  value?: string;
-  onChangeText?: (text: string) => void;
-  placeholder?: string;
-  multiline?: boolean;
-  numberOfLines?: number;
-  style?: any;
-  label?: string;
+interface InputProps extends TextInputProps {
+  variant?: "default" | "outline" | "filled";
+  size?: "sm" | "md" | "lg";
 }
 
-export function Input({
-  value,
-  onChangeText,
-  placeholder,
-  multiline = false,
-  numberOfLines = 1,
-  style,
-  label,
+export function Input({ 
+  variant = "default", 
+  size = "md", 
+  style, 
+  ...props 
 }: InputProps) {
+  const { theme } = useTheme();
+
+  const getInputStyle = (): TextStyle => {
+    const baseStyle: TextStyle = {
+      borderRadius: theme.borderRadius.md,
+      borderWidth: 1,
+      color: theme.colors.text,
+      fontSize: theme.typography.fontSizes.base,
+      fontWeight: theme.typography.fontWeights.normal,
+    };
+
+    // Size variations
+    const sizeMap = {
+      sm: {
+        paddingHorizontal: theme.spacing.sm,
+        paddingVertical: theme.spacing.xs,
+        fontSize: theme.typography.fontSizes.sm,
+        minHeight: 36,
+      },
+      md: {
+        paddingHorizontal: theme.spacing.md,
+        paddingVertical: theme.spacing.sm,
+        fontSize: theme.typography.fontSizes.base,
+        minHeight: 44,
+      },
+      lg: {
+        paddingHorizontal: theme.spacing.lg,
+        paddingVertical: theme.spacing.md,
+        fontSize: theme.typography.fontSizes.lg,
+        minHeight: 52,
+      },
+    };
+
+    // Variant styles
+    let variantStyle = {};
+    switch (variant) {
+      case "outline":
+        variantStyle = {
+          borderColor: theme.colors.border,
+          backgroundColor: "transparent",
+        };
+        break;
+      case "filled":
+        variantStyle = {
+          borderColor: "transparent",
+          backgroundColor: theme.colors.muted,
+        };
+        break;
+      default:
+        variantStyle = {
+          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.card,
+        };
+    }
+
+    return {
+      ...baseStyle,
+      ...sizeMap[size],
+      ...variantStyle,
+    };
+  };
+
   return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#64748b"
-        multiline={multiline}
-        numberOfLines={numberOfLines}
-        style={[styles.input, multiline && styles.multiline, style]}
-        textAlignVertical={multiline ? "top" : "center"}
-      />
-    </View>
+    <TextInput
+      style={[getInputStyle(), style]}
+      placeholderTextColor={theme.colors.textMuted}
+      {...props}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#f1f5f9",
-    marginBottom: 8,
-  },
-  input: {
-    width: "100%",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#334155",
-    backgroundColor: "#0f172a",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#f1f5f9",
-  },
-  multiline: {
-    minHeight: 80,
-    paddingTop: 12,
-  },
-});

@@ -8,18 +8,31 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // for icons
+import { Mail, Lock, Eye, EyeOff } from "lucide-react-native";
 import Toast from "react-native-toast-message";
+import { useTheme } from "../contexts/ThemeContext";
+import { Button } from "./ui/Button";
 import OAuthButtons from "./OAuthButtons";
 
-const LoginForm = ({ onSwitchToSignup, onForgotPassword, onLoginSuccess }) => {
+interface LoginFormProps {
+  onSwitchToSignup: () => void;
+  onForgotPassword: () => void;
+  onLoginSuccess: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ 
+  onSwitchToSignup, 
+  onForgotPassword, 
+  onLoginSuccess 
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { theme } = useTheme();
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.auth?.loading);
-  const token = useSelector((state) => state.auth?.token);
+  const loading = useSelector((state: any) => state.auth?.loading);
+  const token = useSelector((state: any) => state.auth?.token);
   
   // Handle login success when token changes
   useEffect(() => {
@@ -31,171 +44,211 @@ const LoginForm = ({ onSwitchToSignup, onForgotPassword, onLoginSuccess }) => {
     }
   }, [token]);
 
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please fill in all fields",
+      });
+      return;
+    }
+
+    try {
+      const result = await dispatch(login({ email, password }));
+      if (result.type === "auth/login/fulfilled") {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Login successful!",
+        });
+        onLoginSuccess();
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Login failed. Please try again.",
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Email */}
-      <Text style={styles.label}>Email</Text>
-      <View style={styles.inputWrapper}>
-        <Ionicons name="mail-outline" size={20} color="#777" />
+      <Text style={[styles.label, { 
+        color: theme.colors.text,
+        fontSize: theme.typography.fontSizes.sm,
+        fontWeight: theme.typography.fontWeights.medium,
+        marginBottom: theme.spacing.xs,
+      }]}>
+        Email Address
+      </Text>
+      <View style={[styles.inputWrapper, { 
+        backgroundColor: theme.colors.surface,
+        borderColor: theme.colors.border,
+        marginBottom: theme.spacing.md,
+      }]}>
+        <Mail size={20} color={theme.colors.textMuted} />
         <TextInput
-          style={styles.input}
-          placeholder="Enter your Email"
+          style={[styles.input, { 
+            color: theme.colors.text,
+            fontSize: theme.typography.fontSizes.base,
+          }]}
+          placeholder="Enter your email"
+          placeholderTextColor={theme.colors.textMuted}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
+          autoCapitalize="none"
         />
       </View>
 
       {/* Password */}
-      <Text style={styles.label}>Password</Text>
-      <View style={styles.inputWrapper}>
-        <Ionicons name="lock-closed-outline" size={20} color="#777" />
+      <Text style={[styles.label, { 
+        color: theme.colors.text,
+        fontSize: theme.typography.fontSizes.sm,
+        fontWeight: theme.typography.fontWeights.medium,
+        marginBottom: theme.spacing.xs,
+      }]}>
+        Password
+      </Text>
+      <View style={[styles.inputWrapper, { 
+        backgroundColor: theme.colors.surface,
+        borderColor: theme.colors.border,
+        marginBottom: theme.spacing.sm,
+      }]}>
+        <Lock size={20} color={theme.colors.textMuted} />
         <TextInput
-          style={styles.input}
-          placeholder="Enter your Password"
-          secureTextEntry={!showPassword}
+          style={[styles.input, { 
+            color: theme.colors.text,
+            fontSize: theme.typography.fontSizes.base,
+          }]}
+          placeholder="Enter your password"
+          placeholderTextColor={theme.colors.textMuted}
           value={password}
           onChangeText={setPassword}
+          secureTextEntry={!showPassword}
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
-            size={20}
-            color="#777"
-          />
+        <TouchableOpacity
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeIcon}
+        >
+          {showPassword ? (
+            <EyeOff size={20} color={theme.colors.textMuted} />
+          ) : (
+            <Eye size={20} color={theme.colors.textMuted} />
+          )}
         </TouchableOpacity>
       </View>
 
-      {/* Remember me */}
-      <View style={styles.row}>
-        <View style={styles.checkboxRow}>
-          <TouchableOpacity
-            style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-            onPress={() => setRememberMe(!rememberMe)}
-          >
-            {rememberMe && <Ionicons name="checkmark" size={16} color="#fff" />}
-          </TouchableOpacity>
-          <Text style={styles.checkboxLabel}>Remember me</Text>
-        </View>
-        <Text style={styles.link} onPress={onForgotPassword}>
-          Forgot password?
-        </Text>
+      {/* Remember Me & Forgot Password */}
+      <View style={[styles.optionsRow, { marginBottom: theme.spacing.lg }]}>
+        <TouchableOpacity
+          style={styles.rememberMe}
+          onPress={() => setRememberMe(!rememberMe)}
+        >
+          <View style={[styles.checkbox, { 
+            borderColor: theme.colors.border,
+            backgroundColor: rememberMe ? theme.colors.primary : "transparent",
+          }]}>
+            {rememberMe && <Text style={styles.checkmark}>✓</Text>}
+          </View>
+          <Text style={[styles.rememberText, { 
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.fontSizes.sm,
+          }]}>
+            Remember me
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={onForgotPassword}>
+          <Text style={[styles.forgotText, { 
+            color: theme.colors.primary,
+            fontSize: theme.typography.fontSizes.sm,
+          }]}>
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Sign in */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={async () => {
-          if (!email) {
-            Toast.show({ type: "error", text1: "Enter your email!" });
-            return;
-          }
-          if (!password) {
-            Toast.show({ type: "error", text1: "Enter your password!" });
-            return;
-          }
-          // Add email format validation
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(email)) {
-            Toast.show({
-              type: "error",
-              text1: "Enter a valid email address!",
-            });
-            return;
-          }
-          if (password.length < 6) {
-            Toast.show({
-              type: "error",
-              text1: "Password must be at least 6 characters!",
-            });
-            return;
-          }
-          console.log("[LOGIN] Dispatching login with:", { email, password });
-          const response = await dispatch(login(email, password));
-          
-          // Handle specific error cases
-          if (response?.error) {
-            const errorMessage = response.error.toLowerCase();
-            
-            // If user doesn't exist, suggest signup
-            if (errorMessage.includes("user not found") || errorMessage.includes("no user") || errorMessage.includes("doesn't exist")) {
-              Toast.show({
-                type: "error",
-                text1: "User not found",
-                text2: "Please sign up first",
-                onPress: () => onSwitchToSignup()
-              });
-            }
-            // If password is incorrect
-            else if (errorMessage.includes("incorrect password") || errorMessage.includes("invalid password") || errorMessage.includes("wrong password")) {
-              Toast.show({
-                type: "error",
-                text1: "Incorrect password",
-                text2: "Please try again or reset your password",
-                onPress: () => onForgotPassword()
-              });
-            }
-            // Other errors are already handled by the Toast in the login function
-          }
-          // After login, onLoginSuccess will be called in useEffect when token changes
-        }}
-        disabled={loading}
+      {/* Login Button */}
+      <Button
+        onPress={handleLogin}
+        loading={loading}
+        style={{ marginBottom: theme.spacing.lg }}
       >
-        <Text style={styles.buttonText}>
-          {loading ? "Signing In..." : "Sign In"}
+        Sign In
+      </Button>
+
+      {/* Divider */}
+      <View style={[styles.divider, { marginBottom: theme.spacing.lg }]}>
+        <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+        <Text style={[styles.dividerText, { 
+          color: theme.colors.textMuted,
+          backgroundColor: theme.colors.background[0],
+          fontSize: theme.typography.fontSizes.sm,
+        }]}>
+          or continue with
         </Text>
-      </TouchableOpacity>
+        <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+      </View>
 
-      <Text style={styles.signupText}>
-        Don't have an account?{" "}
-        <Text style={styles.link} onPress={onSwitchToSignup}>
-          Sign Up
-        </Text>
-      </Text>
-
-      <Text style={styles.orText}>Or With</Text>
-
-      {/* Social buttons */}
+      {/* OAuth Buttons */}
       <OAuthButtons />
+
+      {/* Sign Up Link */}
+      <View style={[styles.signupRow, { marginTop: theme.spacing.lg }]}>
+        <Text style={[styles.signupText, { 
+          color: theme.colors.textSecondary,
+          fontSize: theme.typography.fontSizes.base,
+        }]}>
+          Don't have an account?{" "}
+        </Text>
+        <TouchableOpacity onPress={onSwitchToSignup}>
+          <Text style={[styles.signupLink, { 
+            color: theme.colors.primary,
+            fontSize: theme.typography.fontSizes.base,
+            fontWeight: theme.typography.fontWeights.semibold,
+          }]}>
+            Sign Up
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    padding: 30,
-    borderRadius: 20,
-    width: "90%",
-    alignSelf: "center",
-    marginTop: 50,
+    width: "100%",
   },
   label: {
-    fontWeight: "600",
-    color: "#151717",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "#ecedec",
-    borderWidth: 1.5,
-    borderRadius: 10,
-    height: 50,
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 48,
   },
   input: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 12,
+    fontSize: 16,
   },
-  row: {
+  eyeIcon: {
+    padding: 4,
+  },
+  optionsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10,
   },
-  checkboxRow: {
+  rememberMe: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -203,57 +256,36 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: "#ecedec",
     borderRadius: 4,
+    marginRight: 8,
     justifyContent: "center",
     alignItems: "center",
   },
-  checkboxChecked: {
-    backgroundColor: "#151717",
-    borderColor: "#151717",
+  checkmark: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
   },
-  checkboxLabel: {
-    marginLeft: 5,
-    fontSize: 14,
-  },
-  link: {
-    color: "#2d79f3",
-    fontWeight: "500",
-  },
-  button: {
-    backgroundColor: "#151717",
-    borderRadius: 10,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  signupText: {
-    textAlign: "center",
-    fontSize: 14,
-    marginVertical: 5,
-  },
-  orText: {
-    textAlign: "center",
-    fontSize: 14,
-    marginVertical: 10,
-  },
-  socialButton: {
+  rememberText: {},
+  forgotText: {},
+  divider: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    borderColor: "#ededef",
-    borderWidth: 1,
-    borderRadius: 10,
-    height: 50,
-    flex: 1,
-    marginHorizontal: 5,
   },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    paddingHorizontal: 16,
+  },
+  signupRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  signupText: {},
+  signupLink: {},
 });
 
 export default LoginForm;

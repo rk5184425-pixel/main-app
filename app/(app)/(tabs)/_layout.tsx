@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { Home, Brain, BookOpen, User, Wrench } from "lucide-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export default function TabLayout() {
   const { theme } = useTheme();
@@ -9,17 +9,23 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: theme.colors.background[0],
+          backgroundColor: theme.colors.card,
           borderTopColor: theme.colors.border,
+          borderTopWidth: 1,
           height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
+          paddingBottom: theme.spacing.sm,
+          paddingTop: theme.spacing.sm,
+          ...theme.shadows.lg,
         },
-        tabBarActiveTintColor: "#ff6b6b",
-        tabBarInactiveTintColor: "#8e8e93",
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textMuted,
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "600",
+          fontSize: theme.typography.fontSizes.xs,
+          fontWeight: theme.typography.fontWeights.semibold,
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginBottom: -4,
         },
       }}
     >
@@ -48,9 +54,7 @@ export default function TabLayout() {
         name="education"
         options={{
           title: "Learn",
-          tabBarIcon: ({ size, color }) => (
-            <BookOpen size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <BookOpen size={size} color={color} />,
         }}
       />
       <Tabs.Screen

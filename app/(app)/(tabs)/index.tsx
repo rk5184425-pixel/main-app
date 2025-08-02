@@ -19,20 +19,21 @@ import {
   Shield,
   TrendingUp,
 } from "lucide-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
-import ThemeToggle from "../../components/ThemeToggle";
+import { useTheme } from "../../../contexts/ThemeContext";
+import ThemeToggle from "../../../components/ThemeToggle";
+import { Card } from "../../../components/ui/Card";
 
 const { width } = Dimensions.get("window");
 
 const HomeScreen = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const features = [
     {
       id: 1,
       title: "Ponzi Simulator",
       description: "Experience how Ponzi schemes work from the inside",
       icon: Brain,
-      color: "#ff6b6b",
+      color: theme.colors.error,
       route: "/pages/PonziSimulator",
     },
     {
@@ -40,7 +41,7 @@ const HomeScreen = () => {
       title: "Red Flag Game",
       description: "Test your ability to spot fraud indicators",
       icon: Flag,
-      color: "#4ecdc4",
+      color: theme.colors.warning,
       route: "/pages/redflags",
     },
     {
@@ -48,7 +49,7 @@ const HomeScreen = () => {
       title: "Story Mode",
       description: "Learn through real-world case studies",
       icon: BookOpen,
-      color: "#45b7d1",
+      color: theme.colors.info,
       route: "/pages/story",
     },
     {
@@ -56,7 +57,7 @@ const HomeScreen = () => {
       title: "Education Center",
       description: "Comprehensive fraud awareness resources",
       icon: GraduationCap,
-      color: "#96ceb4",
+      color: theme.colors.success,
       route: "/(app)/(tabs)/education",
     },
   ];
@@ -67,121 +68,147 @@ const HomeScreen = () => {
     { label: "Success Rate", value: "95%", icon: TrendingUp },
   ];
 
+  const FeatureCard = ({ feature }: { feature: any }) => (
+    <TouchableOpacity
+      style={[styles.featureCard, { width: width * 0.85 }]}
+      onPress={() => router.push(feature.route)}
+      activeOpacity={0.9}
+    >
+      <Card variant="elevated" padding="lg">
+        <View style={styles.featureContent}>
+          <View style={[styles.iconContainer, { backgroundColor: `${feature.color}20` }]}>
+            <feature.icon size={32} color={feature.color} />
+          </View>
+          <View style={styles.featureText}>
+            <Text style={[styles.featureTitle, { color: theme.colors.text }]}>
+              {feature.title}
+            </Text>
+            <Text style={[styles.featureDescription, { color: theme.colors.textSecondary }]}>
+              {feature.description}
+            </Text>
+          </View>
+        </View>
+      </Card>
+    </TouchableOpacity>
+  );
+
+  const StatCard = ({ stat }: { stat: any }) => (
+    <Card variant="elevated" padding="md" style={styles.statCard}>
+      <View style={styles.statContent}>
+        <stat.icon size={24} color={theme.colors.primary} />
+        <Text style={[styles.statValue, { color: theme.colors.text }]}>
+          {stat.value}
+        </Text>
+        <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
+          {stat.label}
+        </Text>
+      </View>
+    </Card>
+  );
+
   return (
     <LinearGradient
-      colors={[theme.colors.background[0], theme.colors.background[1]]}
+      colors={theme.colors.background}
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Header */}
-          <View style={styles.header}>
+          <View style={[styles.header, { paddingHorizontal: theme.spacing.lg }]}>
             <View>
-              <Text style={[styles.greeting, { color: theme.colors.text }]}>
+              <Text style={[styles.greeting, { 
+                color: theme.colors.text,
+                fontSize: theme.typography.fontSizes['2xl'],
+                fontWeight: theme.typography.fontWeights.bold,
+              }]}>
                 Welcome back!
               </Text>
-              <Text
-                style={[styles.subtitle, { color: theme.colors.textSecondary }]}
-              >
+              <Text style={[styles.subtitle, { 
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.fontSizes.base,
+                marginTop: theme.spacing.xs,
+              }]}>
                 Ready to expose some fraud?
               </Text>
             </View>
-            <TouchableOpacity style={styles.notificationButton}>
-              <ThemeToggle />
-            </TouchableOpacity>
+            <ThemeToggle />
           </View>
 
           {/* Stats Section */}
-          <View style={styles.statsContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          <View style={[styles.section, { paddingHorizontal: theme.spacing.lg }]}>
+            <Text style={[styles.sectionTitle, { 
+              color: theme.colors.text,
+              fontSize: theme.typography.fontSizes.xl,
+              fontWeight: theme.typography.fontWeights.semibold,
+              marginBottom: theme.spacing.md,
+            }]}>
               Impact Statistics
             </Text>
             <View style={styles.statsRow}>
               {stats.map((stat, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.statCard,
-                    { backgroundColor: theme.colors.card },
-                  ]}
-                >
-                  <stat.icon size={24} color="#4ecdc4" />
-                  <Text
-                    style={[styles.statValue, { color: theme.colors.text }]}
-                  >
-                    {stat.value}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.statLabel,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
-                    {stat.label}
-                  </Text>
-                </View>
+                <StatCard key={index} stat={stat} />
               ))}
             </View>
           </View>
 
-          {/* Features Grid */}
-          <View style={styles.featuresContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Explore Features
+          {/* Features Section */}
+          <View style={[styles.section, { paddingHorizontal: theme.spacing.lg }]}>
+            <Text style={[styles.sectionTitle, { 
+              color: theme.colors.text,
+              fontSize: theme.typography.fontSizes.xl,
+              fontWeight: theme.typography.fontWeights.semibold,
+              marginBottom: theme.spacing.md,
+            }]}>
+              Interactive Learning
             </Text>
-            <View style={styles.featuresGrid}>
-              {features.map((feature) => (
-                <TouchableOpacity
-                  key={feature.id}
-                  style={styles.featureCard}
-                  onPress={() => router.push(feature.route as any)}
-                  activeOpacity={0.8}
-                >
-                  <LinearGradient
-                    colors={[feature.color, `${feature.color}CC`]}
-                    style={styles.featureGradient}
-                  >
-                    <feature.icon size={32} color="black" />
-                    <Text style={[styles.featureTitle, { color: "black" }]}>
-                      {feature.title}
-                    </Text>
-                    <Text
-                      style={[styles.featureDescription, { color: "black" }]}
-                    >
-                      {feature.description}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
 
-          {/* Quick Tips */}
-          <View style={styles.tipsContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Daily Tip
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.featuresScroll}
+            style={styles.featuresContainer}
+          >
+            {features.map((feature) => (
+              <FeatureCard key={feature.id} feature={feature} />
+            ))}
+          </ScrollView>
+
+          {/* Quick Actions */}
+          <View style={[styles.section, { paddingHorizontal: theme.spacing.lg }]}>
+            <Text style={[styles.sectionTitle, { 
+              color: theme.colors.text,
+              fontSize: theme.typography.fontSizes.xl,
+              fontWeight: theme.typography.fontWeights.semibold,
+              marginBottom: theme.spacing.md,
+            }]}>
+              Quick Actions
             </Text>
-            <View
-              style={[styles.tipCard, { backgroundColor: theme.colors.card }]}
-            >
-              <Text style={[styles.tipIcon, { color: theme.colors.text }]}>
-                💡
-              </Text>
-              <View style={styles.tipContent}>
-                <Text style={[styles.tipTitle, { color: theme.colors.text }]}>
-                  Red Flag Alert!
+            <View style={styles.quickActions}>
+              <TouchableOpacity 
+                style={[styles.quickAction, { backgroundColor: theme.colors.primary }]}
+                onPress={() => router.push("/(app)/(tabs)/tools")}
+              >
+                <Text style={[styles.quickActionText, { 
+                  color: "#ffffff",
+                  fontSize: theme.typography.fontSizes.base,
+                  fontWeight: theme.typography.fontWeights.semibold,
+                }]}>
+                  Security Tools
                 </Text>
-                <Text
-                  style={[
-                    styles.tipText,
-                    { color: theme.colors.textSecondary },
-                  ]}
-                >
-                  If someone promises "guaranteed returns" with no risk, it's
-                  likely a scam. Real investments always carry some level of
-                  risk.
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.quickAction, { backgroundColor: theme.colors.secondary }]}
+                onPress={() => router.push("/(app)/(tabs)/simulator")}
+              >
+                <Text style={[styles.quickActionText, { 
+                  color: "#ffffff",
+                  fontSize: theme.typography.fontSizes.base,
+                  fontWeight: theme.typography.fontWeights.semibold,
+                }]}>
+                  Simulators
                 </Text>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
@@ -197,129 +224,100 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 100,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 30,
+    paddingVertical: 20,
   },
   greeting: {
-    fontSize: 28,
-    fontWeight: "bold",
+    lineHeight: 32,
   },
   subtitle: {
-    fontSize: 16,
-    color: "#b8b8b8",
-    marginTop: 4,
+    lineHeight: 22,
   },
-  notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  statsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+  section: {
+    marginVertical: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 15,
+    lineHeight: 28,
   },
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 12,
   },
   statCard: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.11)",
-    borderRadius: 12,
-    padding: 15,
+    minHeight: 100,
+  },
+  statContent: {
     alignItems: "center",
-    marginHorizontal: 5,
+    justifyContent: "center",
   },
   statValue: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
+    fontSize: 20,
+    fontWeight: "700",
     marginTop: 8,
+    marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#b8b8b8",
     textAlign: "center",
-    marginTop: 4,
-  },
-  featuresContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  featuresGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  featureCard: {
-    width: (width - 50) / 2,
-    height: 160,
-    marginBottom: 15,
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  featureGradient: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
-    marginTop: 12,
-    textAlign: "center",
-  },
-  featureDescription: {
-    fontSize: 12,
-    color: "rgba(255, 255, 255, 0.8)",
-    textAlign: "center",
-    marginTop: 8,
     lineHeight: 16,
   },
-  tipsContainer: {
+  featuresContainer: {
+    marginTop: 8,
+  },
+  featuresScroll: {
     paddingHorizontal: 20,
-    marginBottom: 30,
+    gap: 16,
   },
-  tipCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 20,
+  featureCard: {
+    marginRight: 4,
+  },
+  featureContent: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
-  tipIcon: {
-    fontSize: 24,
-    marginRight: 15,
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
   },
-  tipContent: {
+  featureText: {
     flex: 1,
   },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 8,
+  featureTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 4,
+    lineHeight: 24,
   },
-  tipText: {
+  featureDescription: {
     fontSize: 14,
-    color: "#b8b8b8",
     lineHeight: 20,
+  },
+  quickActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  quickAction: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  quickActionText: {
+    textAlign: "center",
   },
 });
 

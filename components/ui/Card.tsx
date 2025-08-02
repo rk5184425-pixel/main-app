@@ -1,12 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { View, ViewStyle } from "react-native";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface CardProps {
   children: React.ReactNode;
-  style?: any;
-  animated?: boolean;
-  delay?: number;
+  style?: ViewStyle;
+  variant?: "default" | "elevated" | "outline";
+  padding?: "none" | "sm" | "md" | "lg";
 }
 
 interface CardHeaderProps {
@@ -29,24 +29,57 @@ interface CardContentProps {
   style?: any;
 }
 
-export function Card({
-  children,
-  style,
-  animated = false,
-  delay = 0,
+export function Card({ 
+  children, 
+  style, 
+  variant = "default",
+  padding = "md"
 }: CardProps) {
-  if (animated) {
-    return (
-      <Animated.View
-        entering={FadeInUp.delay(delay).springify()}
-        style={[styles.card, style]}
-      >
-        {children}
-      </Animated.View>
-    );
-  }
+  const { theme } = useTheme();
 
-  return <View style={[styles.card, style]}>{children}</View>;
+  const getCardStyle = (): ViewStyle => {
+    const baseStyle: ViewStyle = {
+      borderRadius: theme.borderRadius.lg,
+      backgroundColor: theme.colors.card,
+    };
+
+    // Add padding
+    const paddingMap = {
+      none: 0,
+      sm: theme.spacing.sm,
+      md: theme.spacing.md,
+      lg: theme.spacing.lg,
+    };
+    
+    baseStyle.padding = paddingMap[padding];
+
+    // Apply variant styles
+    switch (variant) {
+      case "elevated":
+        return {
+          ...baseStyle,
+          ...theme.shadows.md,
+        };
+      case "outline":
+        return {
+          ...baseStyle,
+          borderWidth: 1,
+          borderColor: theme.colors.border,
+          backgroundColor: "transparent",
+        };
+      default:
+        return {
+          ...baseStyle,
+          ...theme.shadows.sm,
+        };
+    }
+  };
+
+  return (
+    <View style={[getCardStyle(), style]}>
+      {children}
+    </View>
+  );
 }
 
 export function CardHeader({ children, style }: CardHeaderProps) {
