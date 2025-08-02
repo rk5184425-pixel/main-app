@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 import {
   User,
   Trophy,
@@ -24,6 +25,8 @@ import {
   LogOut,
   Shield,
   GraduationCap,
+  Settings,
+  ChevronRight,
 } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +35,10 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import { setUser } from "../../../redux/slices/profileSlices";
 import { router } from "expo-router";
 import ThemeToggle from "../../../components/ThemeToggle";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/Card";
+import { Badge } from "../../../components/ui/Badge";
+import { Button } from "../../../components/ui/Button";
+import { Progress } from "../../../components/ui/Progress";
 
 const ProfileScreen = () => {
   const dispatch = useDispatch();
@@ -71,254 +78,269 @@ const ProfileScreen = () => {
   };
 
   const badges = [
-    { name: "Red Flag Spotter", icon: Flag, color: "#ff6b6b", earned: true },
-    { name: "Collapse Survivor", icon: Shield, color: "#4ecdc4", earned: true },
-    { name: "Financial Detective", icon: "🔍", color: "#45b7d1", earned: true },
-    { name: "Story Master", icon: BookOpen, color: "#96ceb4", earned: true },
-    { name: "Scheme Buster", icon: "⚖️", color: "#ffd93d", earned: true },
-    { name: "Fraud Fighter", icon: "🛡️", color: "#ff9ff3", earned: true },
-    { name: "Awareness Champion", icon: "📢", color: "#54a0ff", earned: false },
-    {
-      name: "Master Educator",
-      icon: GraduationCap,
-      color: "#5f27cd",
-      earned: false,
-    },
+    { name: "Red Flag Spotter", icon: Flag, color: theme.colors.semantic.error, earned: true },
+    { name: "Collapse Survivor", icon: Shield, color: theme.colors.semantic.success, earned: true },
+    { name: "Financial Detective", icon: "🔍", color: theme.colors.brand.primary, earned: true },
+    { name: "Story Master", icon: BookOpen, color: theme.colors.semantic.info, earned: true },
+    { name: "Scheme Buster", icon: "⚖️", color: theme.colors.brand.accent, earned: true },
+    { name: "Fraud Fighter", icon: "🛡️", color: theme.colors.semantic.warning, earned: true },
+    { name: "Awareness Champion", icon: "📢", color: theme.colors.semantic.info, earned: false },
+    { name: "Master Guardian", icon: "👑", color: theme.colors.brand.primary, earned: false },
   ];
 
-  const achievements = [
+  const menuItems = [
     {
-      title: "First Simulation",
-      description: "Completed your first Ponzi scheme simulation",
-      date: "2024-01-15",
+      title: "Account Settings",
+      subtitle: "Manage your account preferences",
+      icon: Settings,
+      color: theme.colors.text.secondary,
+      onPress: () => router.push("/pages/settings"),
     },
     {
-      title: "Red Flag Expert",
-      description: "Spotted 50 red flags in the detection game",
-      date: "2024-01-20",
+      title: "Notifications",
+      subtitle: "Configure your alerts",
+      icon: Bell,
+      color: theme.colors.semantic.warning,
+      onPress: () => router.push("/pages/notifications"),
     },
     {
-      title: "Story Enthusiast",
-      description: "Completed 10 story mode scenarios",
-      date: "2024-01-25",
+      title: "Language & Region",
+      subtitle: "Set your preferred language",
+      icon: Globe,
+      color: theme.colors.semantic.info,
+      onPress: () => router.push("/pages/language"),
+    },
+    {
+      title: "Help & Support",
+      subtitle: "Get help and contact support",
+      icon: HelpCircle,
+      color: theme.colors.semantic.success,
+      onPress: () => router.push("/pages/help"),
+    },
+    {
+      title: "About",
+      subtitle: "App version and information",
+      icon: Info,
+      color: theme.colors.text.tertiary,
+      onPress: () => router.push("/pages/about"),
     },
   ];
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        onPress: async () => {
-          try {
-            // Clear user state
-            dispatch(setUser(null));
-
-            // Use the auth context logout
-            await signOut();
-            // Navigation will be handled by AuthProvider
-          } catch (error) {
-            console.error("Error during logout:", error);
-          }
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
         },
-        style: "destructive",
-      },
-    ]);
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: signOut,
+        },
+      ]
+    );
   };
 
-  const progressPercentage =
-    (userStats.experiencePoints / userStats.nextLevelXP) * 100;
+  const progressPercentage = (userStats.experiencePoints / userStats.nextLevelXP) * 100;
+
+  const renderBadge = (badge: typeof badges[0], index: number) => (
+    <Animated.View
+      key={badge.name}
+      entering={FadeInUp.delay(index * 50).springify()}
+      style={styles.badgeContainer}
+    >
+      <View style={[
+        styles.badgeIcon,
+        { 
+          backgroundColor: badge.earned ? `${badge.color}20` : theme.colors.surface.secondary,
+          borderColor: badge.earned ? badge.color : theme.colors.border.secondary,
+        }
+      ]}>
+        {typeof badge.icon === "string" ? (
+          <Text style={styles.badgeEmoji}>{badge.icon}</Text>
+        ) : (
+          <badge.icon 
+            size={24} 
+            color={badge.earned ? badge.color : theme.colors.text.disabled} 
+          />
+        )}
+      </View>
+      <Text style={[
+        styles.badgeName,
+        { 
+          color: badge.earned ? theme.colors.text.primary : theme.colors.text.disabled,
+          fontWeight: badge.earned ? theme.typography.fontWeights.semibold : theme.typography.fontWeights.normal,
+        }
+      ]}>
+        {badge.name}
+      </Text>
+    </Animated.View>
+  );
+
+  const renderMenuItem = (item: typeof menuItems[0], index: number) => (
+    <Animated.View
+      key={item.title}
+      entering={FadeInDown.delay(index * 50).springify()}
+    >
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={item.onPress}
+        activeOpacity={0.7}
+      >
+        <View style={styles.menuItemLeft}>
+          <View style={[styles.menuIcon, { backgroundColor: `${item.color}20` }]}>
+            <item.icon size={20} color={item.color} />
+          </View>
+          <View style={styles.menuTextContainer}>
+            <Text style={[styles.menuTitle, { color: theme.colors.text.primary }]}>
+              {item.title}
+            </Text>
+            <Text style={[styles.menuSubtitle, { color: theme.colors.text.secondary }]}>
+              {item.subtitle}
+            </Text>
+          </View>
+        </View>
+        <ChevronRight size={20} color={theme.colors.text.tertiary} />
+      </TouchableOpacity>
+    </Animated.View>
+  );
 
   return (
-    <LinearGradient colors={["#1a1a2e", "#16213e"]} style={styles.container}>
+    <LinearGradient
+      colors={theme.colors.background.gradient}
+      style={styles.container}
+    >
       <SafeAreaView style={styles.safeArea}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.avatarContainer}>
-              {userData?.avatar ? (
-                <Image
-                  source={{ uri: userData.avatar }}
-                  style={styles.avatar}
-                  resizeMode="cover"
-                />
-              ) : (
-                <LinearGradient
-                  colors={["#ff6b6b", "#4ecdc4"]}
-                  style={styles.avatar}
-                >
-                  <User size={40} color="white" />
-                </LinearGradient>
-              )}
-            </View>
-            <Text style={styles.userName}>
-              {userData
-                ? `${userData.firstName || ""} ${
-                    userData.lastName || ""
-                  }`.trim()
-                : "Fraud Fighter"}
+          <Animated.View entering={FadeInDown.springify()} style={styles.header}>
+            <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>
+              Profile
             </Text>
-            <Text style={styles.userLevel}>{userStats.currentLevel}</Text>
-          </View>
+            <ThemeToggle />
+          </Animated.View>
 
-          {/* Progress Section */}
-          <View style={styles.progressContainer}>
-            <Text style={styles.sectionTitle}>Progress</Text>
-            <View style={styles.progressCard}>
-              <View style={styles.progressHeader}>
-                <Text style={styles.progressText}>
-                  {userStats.experiencePoints} / {userStats.nextLevelXP} XP
-                </Text>
-                <Text style={styles.progressPercentage}>
-                  {Math.round(progressPercentage)}%
-                </Text>
-              </View>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${progressPercentage}%` },
-                  ]}
+          {/* User Info Card */}
+          <Animated.View entering={FadeInUp.delay(100).springify()}>
+            <Card variant="elevated" size="lg" style={styles.userCard}>
+              <CardContent>
+                <View style={styles.userInfo}>
+                  <View style={[styles.avatar, { backgroundColor: theme.colors.brand.primary }]}>
+                    <User size={40} color={theme.colors.text.inverse} />
+                  </View>
+                  <View style={styles.userDetails}>
+                    <Text style={[styles.userName, { color: theme.colors.text.primary }]}>
+                      {userData?.name || "John Doe"}
+                    </Text>
+                    <Text style={[styles.userEmail, { color: theme.colors.text.secondary }]}>
+                      {userData?.email || "john.doe@example.com"}
+                    </Text>
+                    <Badge variant="success" size="sm" style={styles.levelBadge}>
+                      {userStats.currentLevel}
+                    </Badge>
+                  </View>
+                </View>
+              </CardContent>
+            </Card>
+          </Animated.View>
+
+          {/* Progress Card */}
+          <Animated.View entering={FadeInUp.delay(200).springify()}>
+            <Card variant="default" size="lg" style={styles.progressCard}>
+              <CardHeader>
+                <CardTitle size="lg">Learning Progress</CardTitle>
+                <CardDescription>
+                  {userStats.experiencePoints} / {userStats.nextLevelXP} XP to next level
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Progress 
+                  value={progressPercentage} 
+                  variant="success" 
+                  size="lg" 
+                  style={styles.progressBar}
                 />
-              </View>
-              <Text style={styles.progressLabel}>
-                {userStats.nextLevelXP - userStats.experiencePoints} XP to next
-                level
-              </Text>
-            </View>
-          </View>
-
-          {/* Stats Section */}
-          <View style={styles.statsContainer}>
-            <Text style={styles.sectionTitle}>Your Stats</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}>
-                <Brain size={24} color="#ff6b6b" />
-                <Text style={styles.statValue}>{userStats.schemesExposed}</Text>
-                <Text style={styles.statLabel}>Schemes Exposed</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Flag size={24} color="#4ecdc4" />
-                <Text style={styles.statValue}>
-                  {userStats.redFlagsSpotted}
-                </Text>
-                <Text style={styles.statLabel}>Red Flags Spotted</Text>
-              </View>
-              <View style={styles.statCard}>
-                <BookOpen size={24} color="#45b7d1" />
-                <Text style={styles.statValue}>
-                  {userStats.storiesCompleted}
-                </Text>
-                <Text style={styles.statLabel}>Stories Completed</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Trophy size={24} color="#ffd93d" />
-                <Text style={styles.statValue}>{userStats.badgesEarned}</Text>
-                <Text style={styles.statLabel}>Badges Earned</Text>
-              </View>
-            </View>
-          </View>
+                <View style={styles.statsGrid}>
+                  <View style={styles.statItem}>
+                    <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+                      {userStats.schemesExposed}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+                      Schemes Exposed
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+                      {userStats.redFlagsSpotted}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+                      Red Flags Spotted
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+                      {userStats.storiesCompleted}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+                      Stories Completed
+                    </Text>
+                  </View>
+                </View>
+              </CardContent>
+            </Card>
+          </Animated.View>
 
           {/* Badges Section */}
-          <View style={styles.badgesContainer}>
-            <Text style={styles.sectionTitle}>Badges Collection</Text>
-            <View style={styles.badgesGrid}>
-              {badges.map((badge, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.badgeCard,
-                    !badge.earned && styles.badgeCardLocked,
-                  ]}
-                >
-                  {typeof badge.icon === "string" ? (
-                    <Text
-                      style={[
-                        styles.badgeIconText,
-                        { color: badge.earned ? badge.color : "#666" },
-                      ]}
-                    >
-                      {badge.icon}
-                    </Text>
-                  ) : (
-                    <badge.icon
-                      size={24}
-                      color={badge.earned ? badge.color : "#666"}
-                    />
-                  )}
-                  <Text
-                    style={[
-                      styles.badgeName,
-                      !badge.earned && styles.badgeNameLocked,
-                    ]}
-                  >
-                    {badge.name}
-                  </Text>
+          <Animated.View entering={FadeInUp.delay(300).springify()}>
+            <Card variant="default" size="lg" style={styles.badgesCard}>
+              <CardHeader>
+                <CardTitle size="lg">Achievements</CardTitle>
+                <CardDescription>
+                  {badges.filter(b => b.earned).length} of {badges.length} badges earned
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <View style={styles.badgesGrid}>
+                  {badges.map(renderBadge)}
                 </View>
-              ))}
-            </View>
+              </CardContent>
+            </Card>
+          </Animated.View>
+
+          {/* Menu Items */}
+          <View style={styles.menuSection}>
+            <Animated.View entering={FadeInUp.delay(400).springify()}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
+                Settings
+              </Text>
+            </Animated.View>
+            <Card variant="default" size="md">
+              <CardContent style={styles.menuContent}>
+                {menuItems.map(renderMenuItem)}
+              </CardContent>
+            </Card>
           </View>
 
-          {/* Recent Achievements */}
-          <View style={styles.achievementsContainer}>
-            <Text style={styles.sectionTitle}>Recent Achievements</Text>
-            {achievements.map((achievement, index) => (
-              <View key={index} style={styles.achievementCard}>
-                <Trophy size={24} color="#ffd93d" />
-                <View style={styles.achievementContent}>
-                  <Text style={styles.achievementTitle}>
-                    {achievement.title}
-                  </Text>
-                  <Text style={styles.achievementDescription}>
-                    {achievement.description}
-                  </Text>
-                  <Text style={styles.achievementDate}>{achievement.date}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Settings Section */}
-          <View style={styles.settingsContainer}>
-            <Text style={styles.sectionTitle}>Settings</Text>
-
-            <TouchableOpacity style={styles.settingItem}>
-              <Bell size={24} color="#4ecdc4" />
-              <Text style={styles.settingText}>Notifications</Text>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.settingItem}>
-              <Globe size={24} color="#45b7d1" />
-              <Text style={styles.settingText}>Language</Text>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => router.push("/pages/LearnScreen")}
-            >
-              <HelpCircle size={24} color="#96ceb4" />
-              <Text style={styles.settingText}>Help & Support</Text>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.settingItem}>
-              <Info size={24} color="#ffd93d" />
-              <Text style={styles.settingText}>About</Text>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.settingItem, styles.logoutItem]}
+          {/* Logout Button */}
+          <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.logoutSection}>
+            <Button
+              variant="outline"
+              size="lg"
               onPress={handleLogout}
+              leftIcon={<LogOut size={20} color={theme.colors.semantic.error} />}
+              style={[styles.logoutButton, { borderColor: theme.colors.semantic.error }]}
             >
-              <LogOut size={24} color="#ff6b6b" />
-              <Text style={[styles.settingText, styles.logoutText]}>
+              <Text style={{ color: theme.colors.semantic.error, fontWeight: theme.typography.fontWeights.semibold }}>
                 Logout
               </Text>
-            </TouchableOpacity>
-          </View>
+            </Button>
+          </Animated.View>
+
+          {/* Bottom Spacing */}
+          <View style={{ height: 100 }} />
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -333,199 +355,152 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 30,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
-  avatarContainer: {
-    marginBottom: 15,
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+  },
+  userCard: {
+    marginHorizontal: 24,
+    marginBottom: 16,
+  },
+  userInfo: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  userDetails: {
+    flex: 1,
   },
   userName: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 5,
+    fontWeight: "700",
+    marginBottom: 4,
   },
-  userLevel: {
+  userEmail: {
     fontSize: 16,
-    color: "#4ecdc4",
-    fontWeight: "600",
+    marginBottom: 8,
   },
-  progressContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 15,
+  levelBadge: {
+    alignSelf: "flex-start",
   },
   progressCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 20,
-  },
-  progressHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  progressText: {
-    fontSize: 16,
-    color: "white",
-    fontWeight: "600",
-  },
-  progressPercentage: {
-    fontSize: 16,
-    color: "#4ecdc4",
-    fontWeight: "bold",
+    marginHorizontal: 24,
+    marginBottom: 16,
   },
   progressBar: {
-    height: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 4,
-    marginBottom: 10,
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#4ecdc4",
-    borderRadius: 4,
-  },
-  progressLabel: {
-    fontSize: 14,
-    color: "#b8b8b8",
-    textAlign: "center",
-  },
-  statsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   statsGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
-  statCard: {
-    width: "48%",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 15,
+  statItem: {
     alignItems: "center",
-    marginBottom: 10,
   },
   statValue: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-    marginTop: 8,
+    fontWeight: "800",
+    marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#b8b8b8",
+    fontWeight: "600",
     textAlign: "center",
-    marginTop: 4,
   },
-  badgesContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+  badgesCard: {
+    marginHorizontal: 24,
+    marginBottom: 16,
   },
   badgesGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  badgeCard: {
-    width: "48%",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 15,
+  badgeContainer: {
+    width: "23%",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 16,
   },
-  badgeCardLocked: {
-    opacity: 0.5,
+  badgeIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    marginBottom: 8,
   },
-  badgeIconText: {
-    fontSize: 24,
+  badgeEmoji: {
+    fontSize: 20,
   },
   badgeName: {
-    fontSize: 12,
-    color: "white",
+    fontSize: 10,
     textAlign: "center",
-    marginTop: 8,
-    fontWeight: "600",
+    lineHeight: 12,
   },
-  badgeNameLocked: {
-    color: "#666",
+  menuSection: {
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
-  achievementsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 12,
   },
-  achievementCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 10,
+  menuContent: {
+    paddingVertical: 8,
   },
-  achievementContent: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  achievementTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 4,
-  },
-  achievementDescription: {
-    fontSize: 14,
-    color: "#b8b8b8",
-    lineHeight: 18,
-    marginBottom: 4,
-  },
-  achievementDate: {
-    fontSize: 12,
-    color: "#666",
-  },
-  settingsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  settingItem: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 15,
+  menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 4,
   },
-  settingText: {
+  menuItemLeft: {
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
+  },
+  menuIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  menuTextContainer: {
+    flex: 1,
+  },
+  menuTitle: {
     fontSize: 16,
-    color: "white",
-    marginLeft: 15,
-    fontWeight: "500",
+    fontWeight: "600",
+    marginBottom: 2,
   },
-  chevron: {
-    fontSize: 24,
-    color: "#b8b8b8",
+  menuSubtitle: {
+    fontSize: 14,
+    lineHeight: 18,
   },
-  logoutItem: {
-    marginTop: 10,
+  logoutSection: {
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
-  logoutText: {
-    color: "#ff6b6b",
+  logoutButton: {
+    borderWidth: 2,
   },
 });
 

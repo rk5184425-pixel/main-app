@@ -10,6 +10,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 import {
   Brain,
   Flag,
@@ -18,17 +19,21 @@ import {
   Eye,
   Shield,
   TrendingUp,
+  ChevronRight,
 } from "lucide-react-native";
 import { useTheme } from "../../../contexts/ThemeContext";
 import ThemeToggle from "../../../components/ThemeToggle";
 import ChatbotButton from "../../../components/ChatbotButton";
 import ChatbotPopup from "../../../components/ChatbotPopup";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/Card";
+import { Badge } from "../../../components/ui/Badge";
 
 const { width } = Dimensions.get("window");
 
 const HomeScreen = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [isPopupVisible, setPopupVisible] = useState(false);
+  
   const features = [
     {
       id: 1,
@@ -37,6 +42,8 @@ const HomeScreen = () => {
       icon: Brain,
       color: theme.colors.semantic.error,
       route: "/pages/PonziSimulator",
+      badge: "Interactive",
+      badgeVariant: "destructive" as const,
     },
     {
       id: 2,
@@ -45,6 +52,8 @@ const HomeScreen = () => {
       icon: Flag,
       color: theme.colors.semantic.warning,
       route: "/pages/redflags",
+      badge: "Game",
+      badgeVariant: "warning" as const,
     },
     {
       id: 3,
@@ -53,6 +62,8 @@ const HomeScreen = () => {
       icon: BookOpen,
       color: theme.colors.brand.primary,
       route: "/pages/story",
+      badge: "Educational",
+      badgeVariant: "info" as const,
     },
     {
       id: 4,
@@ -61,14 +72,79 @@ const HomeScreen = () => {
       icon: GraduationCap,
       color: theme.colors.semantic.success,
       route: "/(app)/(tabs)/education",
+      badge: "Learning",
+      badgeVariant: "success" as const,
     },
   ];
 
   const stats = [
-    { label: "Schemes Exposed", value: "50+", icon: Eye },
-    { label: "Users Protected", value: "10K+", icon: Shield },
-    { label: "Success Rate", value: "95%", icon: TrendingUp },
+    { label: "Schemes Exposed", value: "50+", icon: Eye, color: theme.colors.brand.primary },
+    { label: "Users Protected", value: "10K+", icon: Shield, color: theme.colors.semantic.success },
+    { label: "Success Rate", value: "95%", icon: TrendingUp, color: theme.colors.semantic.info },
   ];
+
+  const renderFeatureCard = (feature: typeof features[0], index: number) => (
+    <Animated.View
+      key={feature.id}
+      entering={FadeInUp.delay(index * 100).springify()}
+    >
+      <TouchableOpacity
+        onPress={() => router.push(feature.route as any)}
+        style={styles.featureCardTouchable}
+        activeOpacity={0.8}
+      >
+        <Card variant="elevated" size="lg" style={styles.featureCard}>
+          <CardContent>
+            <View style={styles.featureCardHeader}>
+              <View style={[styles.featureIconContainer, { backgroundColor: `${feature.color}20` }]}>
+                <feature.icon size={32} color={feature.color} />
+              </View>
+              <Badge variant={feature.badgeVariant} size="sm">
+                {feature.badge}
+              </Badge>
+            </View>
+            
+            <CardTitle size="lg" style={styles.featureTitle}>
+              {feature.title}
+            </CardTitle>
+            
+            <CardDescription style={styles.featureDescription}>
+              {feature.description}
+            </CardDescription>
+            
+            <View style={styles.featureCardFooter}>
+              <Text style={[styles.exploreText, { color: feature.color }]}>
+                Explore
+              </Text>
+              <ChevronRight size={16} color={feature.color} />
+            </View>
+          </CardContent>
+        </Card>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  const renderStatCard = (stat: typeof stats[0], index: number) => (
+    <Animated.View
+      key={stat.label}
+      entering={FadeInDown.delay(index * 100).springify()}
+      style={styles.statCard}
+    >
+      <Card variant="glass" size="md">
+        <CardContent style={styles.statCardContent}>
+          <View style={[styles.statIconContainer, { backgroundColor: `${stat.color}20` }]}>
+            <stat.icon size={24} color={stat.color} />
+          </View>
+          <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+            {stat.value}
+          </Text>
+          <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+            {stat.label}
+          </Text>
+        </CardContent>
+      </Card>
+    </Animated.View>
+  );
 
   return (
     <LinearGradient
@@ -78,120 +154,69 @@ const HomeScreen = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header */}
-          <View style={styles.header}>
+          <Animated.View entering={FadeInDown.springify()} style={styles.header}>
             <View>
               <Text style={[styles.greeting, { color: theme.colors.text.primary }]}>
                 Welcome back!
               </Text>
-              <Text
-                style={[styles.subtitle, { color: theme.colors.text.secondary }]}
-              >
+              <Text style={[styles.subtitle, { color: theme.colors.text.secondary }]}>
                 Ready to expose some fraud?
               </Text>
             </View>
-            <TouchableOpacity style={styles.notificationButton}>
-              <ThemeToggle />
-            </TouchableOpacity>
-          </View>
+            <ThemeToggle />
+          </Animated.View>
+
+          {/* Hero Section */}
+          <Animated.View entering={FadeInUp.delay(200).springify()}>
+            <LinearGradient
+              colors={theme.colors.background.heroGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroSection}
+            >
+              <Text style={[styles.heroTitle, { color: theme.colors.text.inverse }]}>
+                Master Financial Security
+              </Text>
+              <Text style={[styles.heroSubtitle, { color: theme.colors.text.inverse }]}>
+                Learn to identify and avoid financial fraud through interactive simulations
+              </Text>
+            </LinearGradient>
+          </Animated.View>
 
           {/* Stats Section */}
           <View style={styles.statsContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
-              Impact Statistics
-            </Text>
-            <View style={styles.statsRow}>
-              {stats.map((stat, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.statCard,
-                    { backgroundColor: theme.colors.surface.primary },
-                  ]}
-                >
-                  <stat.icon size={24} color={theme.colors.brand.primary} />
-                  <Text
-                    style={[styles.statValue, { color: theme.colors.text.primary }]}
-                  >
-                    {stat.value}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.statLabel,
-                      { color: theme.colors.text.secondary },
-                    ]}
-                  >
-                    {stat.label}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* Features Grid */}
-          <View style={styles.featuresContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
-              Explore Features
-            </Text>
-            <View style={styles.featuresGrid}>
-              {features.map((feature) => (
-                <TouchableOpacity
-                  key={feature.id}
-                  style={styles.featureCard}
-                  onPress={() => router.push(feature.route as any)}
-                  activeOpacity={0.8}
-                >
-                  <LinearGradient
-                    colors={[feature.color, `${feature.color}CC`]}
-                    style={styles.featureGradient}
-                  >
-                    <feature.icon size={32} color={theme.colors.text.inverse} />
-                    <Text style={[styles.featureTitle, { color: theme.colors.text.inverse }]}>
-                      {feature.title}
-                    </Text>
-                    <Text
-                      style={[styles.featureDescription, { color: theme.colors.text.inverse }]}
-                    >
-                      {feature.description}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Quick Tips */}
-          <View style={styles.tipsContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
-              Daily Tip
-            </Text>
-            <View
-              style={[styles.tipCard, { backgroundColor: theme.colors.surface.primary }]}
-            >
-              <Text style={[styles.tipIcon, { color: theme.colors.text.primary }]}>
-                💡
+            <Animated.View entering={FadeInUp.delay(300).springify()}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
+                Impact Statistics
               </Text>
-              <View style={styles.tipContent}>
-                <Text style={[styles.tipTitle, { color: theme.colors.text.primary }]}>
-                  Red Flag Alert!
-                </Text>
-                <Text
-                  style={[
-                    styles.tipText,
-                    { color: theme.colors.text.secondary },
-                  ]}
-                >
-                  If someone promises "guaranteed returns" with no risk, it's
-                  likely a scam. Real investments always carry some level of
-                  risk.
-                </Text>
-              </View>
+            </Animated.View>
+            <View style={styles.statsGrid}>
+              {stats.map(renderStatCard)}
             </View>
           </View>
-        </ScrollView>
-        {/* Floating Chatbot Button */}
-        <ChatbotButton onPress={() => setPopupVisible(true)} />
 
-        {/* Popup */}
+          {/* Features Section */}
+          <View style={styles.featuresContainer}>
+            <Animated.View entering={FadeInUp.delay(400).springify()}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
+                Learning Modules
+              </Text>
+              <Text style={[styles.sectionSubtitle, { color: theme.colors.text.secondary }]}>
+                Interactive experiences to build your fraud detection skills
+              </Text>
+            </Animated.View>
+            
+            <View style={styles.featuresGrid}>
+              {features.map(renderFeatureCard)}
+            </View>
+          </View>
+
+          {/* Bottom Spacing */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        {/* Chatbot */}
+        <ChatbotButton onPress={() => setPopupVisible(true)} />
         <ChatbotPopup
           visible={isPopupVisible}
           onClose={() => setPopupVisible(false)}
@@ -212,125 +237,122 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 30,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   greeting: {
     fontSize: 28,
-    fontWeight: "bold",
+    fontWeight: "800",
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: "#b8b8b8",
-    marginTop: 4,
+    fontWeight: "500",
   },
-  notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    justifyContent: "center",
+  heroSection: {
+    marginHorizontal: 24,
+    marginBottom: 32,
+    padding: 32,
+    borderRadius: 24,
     alignItems: "center",
   },
+  heroTitle: {
+    fontSize: 32,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "center",
+    opacity: 0.9,
+    lineHeight: 24,
+  },
   statsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    paddingHorizontal: 24,
+    marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 15,
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 8,
   },
-  statsRow: {
+  sectionSubtitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  statsGrid: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 12,
   },
   statCard: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.11)",
-    borderRadius: 12,
-    padding: 15,
+  },
+  statCardContent: {
     alignItems: "center",
-    marginHorizontal: 5,
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
   },
   statValue: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-    marginTop: 8,
+    fontWeight: "800",
+    marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#b8b8b8",
+    fontWeight: "600",
     textAlign: "center",
-    marginTop: 4,
   },
   featuresContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    paddingHorizontal: 24,
   },
   featuresGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    gap: 16,
+  },
+  featureCardTouchable: {
+    marginBottom: 4,
   },
   featureCard: {
-    width: (width - 50) / 2,
-    height: 160,
-    marginBottom: 15,
-    borderRadius: 16,
-    overflow: "hidden",
+    borderRadius: 20,
   },
-  featureGradient: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
+  featureCardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 16,
+  },
+  featureIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   featureTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
-    marginTop: 12,
-    textAlign: "center",
-  },
-  featureDescription: {
-    fontSize: 12,
-    color: "rgba(255, 255, 255, 0.8)",
-    textAlign: "center",
-    marginTop: 8,
-    lineHeight: 16,
-  },
-  tipsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  tipCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 20,
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  tipIcon: {
-    fontSize: 24,
-    marginRight: 15,
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
     marginBottom: 8,
   },
-  tipText: {
-    fontSize: 14,
-    color: "#b8b8b8",
-    lineHeight: 20,
+  featureDescription: {
+    marginBottom: 16,
+  },
+  featureCardFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  exploreText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginRight: 8,
   },
 });
 

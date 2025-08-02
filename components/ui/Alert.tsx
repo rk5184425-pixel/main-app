@@ -2,25 +2,97 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface AlertProps {
   children: React.ReactNode;
-  variant?: "default" | "destructive" | "warning" | "success";
+  variant?: "default" | "destructive" | "warning" | "success" | "info";
+  style?: any;
+  size?: "sm" | "md" | "lg";
+}
+
+interface AlertTitleProps {
+  children: React.ReactNode;
   style?: any;
 }
 
-export function Alert({ children, variant = "default", style }: AlertProps) {
+interface AlertDescriptionProps {
+  children: React.ReactNode;
+  style?: any;
+}
+
+export function Alert({ children, variant = "default", style, size = "md" }: AlertProps) {
+  const { theme } = useTheme();
+
   const getAlertStyle = () => {
+    const baseStyle = {
+      flexDirection: "row" as const,
+      borderRadius: theme.borderRadius.xl,
+      borderWidth: 1,
+      ...theme.shadows.sm,
+    };
+
+    let sizeStyle = {};
+    let variantStyle = {};
+
+    // Size styles
+    switch (size) {
+      case "sm":
+        sizeStyle = {
+          padding: theme.spacing.sm,
+        };
+        break;
+      case "md":
+        sizeStyle = {
+          padding: theme.spacing.md,
+        };
+        break;
+      case "lg":
+        sizeStyle = {
+          padding: theme.spacing.lg,
+        };
+        break;
+    }
+
+    // Variant styles
     switch (variant) {
       case "destructive":
-        return styles.destructive;
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.errorBg,
+          borderColor: theme.colors.semantic.error,
+        };
+        break;
       case "warning":
-        return styles.warning;
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.warningBg,
+          borderColor: theme.colors.semantic.warning,
+        };
+        break;
       case "success":
-        return styles.success;
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.successBg,
+          borderColor: theme.colors.semantic.success,
+        };
+        break;
+      case "info":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.infoBg,
+          borderColor: theme.colors.semantic.info,
+        };
+        break;
       default:
-        return styles.default;
+        variantStyle = {
+          backgroundColor: theme.colors.surface.secondary,
+          borderColor: theme.colors.border.primary,
+        };
+        break;
     }
+
+    return {
+      ...baseStyle,
+      ...sizeStyle,
+      ...variantStyle,
+    };
   };
 
   const getIcon = () => {
@@ -31,6 +103,8 @@ export function Alert({ children, variant = "default", style }: AlertProps) {
         return "warning";
       case "success":
         return "checkmark-circle";
+      case "info":
+        return "information-circle";
       default:
         return "information-circle";
     }
@@ -39,93 +113,94 @@ export function Alert({ children, variant = "default", style }: AlertProps) {
   const getIconColor = () => {
     switch (variant) {
       case "destructive":
-        return "#ef4444";
+        return theme.colors.semantic.error;
       case "warning":
-        return "#f59e0b";
+        return theme.colors.semantic.warning;
       case "success":
-        return "#10b981";
+        return theme.colors.semantic.success;
+      case "info":
+        return theme.colors.semantic.info;
       default:
-        return "#3b82f6";
+        return theme.colors.text.secondary;
+    }
+  };
+
+  const getIconSize = () => {
+    switch (size) {
+      case "sm":
+        return 16;
+      case "md":
+        return 20;
+      case "lg":
+        return 24;
+      default:
+        return 20;
     }
   };
 
   return (
     <Animated.View
-      entering={FadeInDown.springify()}
-      exiting={FadeOutUp.springify()}
-      style={[styles.alert, getAlertStyle(), style]}
+      entering={FadeInDown.springify().damping(15).stiffness(100)}
+      exiting={FadeOutUp.springify().damping(15).stiffness(100)}
+      style={[getAlertStyle(), style]}
     >
       <Ionicons
         name={getIcon() as any}
-        size={20}
+        size={getIconSize()}
         color={getIconColor()}
-        style={styles.icon}
+        style={[styles.icon, { marginRight: theme.spacing.sm }]}
       />
       <View style={styles.content}>{children}</View>
     </Animated.View>
   );
 }
 
-export function AlertTitle({
-  children,
-  style,
-}: {
-  children: React.ReactNode;
-  style?: any;
-}) {
-  return <Text style={[styles.title, style]}>{children}</Text>;
+export function AlertTitle({ children, style }: AlertTitleProps) {
+  const { theme } = useTheme();
+
+  return (
+    <Text
+      style={[
+        {
+          fontSize: theme.typography.fontSizes.base,
+          fontWeight: theme.typography.fontWeights.semibold,
+          color: theme.colors.text.primary,
+          marginBottom: theme.spacing.xs,
+          lineHeight: theme.typography.lineHeights.tight,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </Text>
+  );
 }
 
-export function AlertDescription({
-  children,
-  style,
-}: {
-  children: React.ReactNode;
-  style?: any;
-}) {
-  return <Text style={[styles.description, style]}>{children}</Text>;
+export function AlertDescription({ children, style }: AlertDescriptionProps) {
+  const { theme } = useTheme();
+
+  return (
+    <Text
+      style={[
+        {
+          fontSize: theme.typography.fontSizes.sm,
+          fontWeight: theme.typography.fontWeights.normal,
+          color: theme.colors.text.secondary,
+          lineHeight: theme.typography.lineHeights.relaxed,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </Text>
+  );
 }
 
 const styles = StyleSheet.create({
-  alert: {
-    flexDirection: "row",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginVertical: 8,
-  },
-  default: {
-    backgroundColor: "rgba(59, 130, 246, 0.1)",
-    borderColor: "rgba(59, 130, 246, 0.3)",
-  },
-  destructive: {
-    backgroundColor: "rgba(239, 68, 68, 0.1)",
-    borderColor: "rgba(239, 68, 68, 0.3)",
-  },
-  warning: {
-    backgroundColor: "rgba(245, 158, 11, 0.1)",
-    borderColor: "rgba(245, 158, 11, 0.3)",
-  },
-  success: {
-    backgroundColor: "rgba(16, 185, 129, 0.1)",
-    borderColor: "rgba(16, 185, 129, 0.3)",
-  },
   icon: {
-    marginRight: 12,
     marginTop: 2,
   },
   content: {
     flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#f9fafb",
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 14,
-    color: "#d1d5db",
-    lineHeight: 20,
   },
 });

@@ -1,84 +1,150 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "default" | "secondary" | "destructive" | "outline";
+  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info";
+  size?: "sm" | "md" | "lg";
   style?: any;
 }
 
-export function Badge({ children, variant = "default", style }: BadgeProps) {
+export function Badge({ children, variant = "default", size = "md", style }: BadgeProps) {
+  const { theme } = useTheme();
+
   const getBadgeStyle = () => {
-    switch (variant) {
-      case "secondary":
-        return styles.secondary;
-      case "destructive":
-        return styles.destructive;
-      case "outline":
-        return styles.outline;
-      default:
-        return styles.default;
+    const baseStyle = {
+      alignSelf: "flex-start" as const,
+      borderRadius: theme.borderRadius.full,
+      borderWidth: 1,
+      alignItems: "center" as const,
+      justifyContent: "center" as const,
+    };
+
+    let sizeStyle = {};
+    let variantStyle = {};
+
+    // Size styles
+    switch (size) {
+      case "sm":
+        sizeStyle = {
+          paddingHorizontal: theme.spacing.xs,
+          paddingVertical: 2,
+          minHeight: 20,
+        };
+        break;
+      case "md":
+        sizeStyle = {
+          paddingHorizontal: theme.spacing.sm,
+          paddingVertical: theme.spacing.xs,
+          minHeight: 24,
+        };
+        break;
+      case "lg":
+        sizeStyle = {
+          paddingHorizontal: theme.spacing.md,
+          paddingVertical: theme.spacing.sm,
+          minHeight: 32,
+        };
+        break;
     }
+
+    // Variant styles
+    switch (variant) {
+      case "default":
+        variantStyle = {
+          backgroundColor: theme.colors.brand.primary,
+          borderColor: theme.colors.brand.primary,
+        };
+        break;
+      case "secondary":
+        variantStyle = {
+          backgroundColor: theme.colors.surface.secondary,
+          borderColor: theme.colors.border.primary,
+        };
+        break;
+      case "destructive":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.error,
+          borderColor: theme.colors.semantic.error,
+        };
+        break;
+      case "success":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.success,
+          borderColor: theme.colors.semantic.success,
+        };
+        break;
+      case "warning":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.warning,
+          borderColor: theme.colors.semantic.warning,
+        };
+        break;
+      case "info":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.info,
+          borderColor: theme.colors.semantic.info,
+        };
+        break;
+      case "outline":
+        variantStyle = {
+          backgroundColor: "transparent",
+          borderColor: theme.colors.border.primary,
+        };
+        break;
+    }
+
+    return {
+      ...baseStyle,
+      ...sizeStyle,
+      ...variantStyle,
+    };
   };
 
   const getTextStyle = () => {
+    let fontSize = theme.typography.fontSizes.xs;
+    let fontWeight = theme.typography.fontWeights.semibold;
+
+    switch (size) {
+      case "sm":
+        fontSize = theme.typography.fontSizes.xs;
+        break;
+      case "md":
+        fontSize = theme.typography.fontSizes.sm;
+        break;
+      case "lg":
+        fontSize = theme.typography.fontSizes.base;
+        break;
+    }
+
+    let textColor = theme.colors.text.inverse;
+
     switch (variant) {
       case "secondary":
-        return styles.secondaryText;
-      case "destructive":
-        return styles.destructiveText;
       case "outline":
-        return styles.outlineText;
-      default:
-        return styles.defaultText;
+        textColor = theme.colors.text.primary;
+        break;
+      case "default":
+      case "destructive":
+      case "success":
+      case "warning":
+      case "info":
+        textColor = theme.colors.text.inverse;
+        break;
     }
+
+    return {
+      fontSize,
+      fontWeight,
+      color: textColor,
+      textAlign: "center" as const,
+    };
   };
 
   return (
-    <View style={[styles.badge, getBadgeStyle(), style]}>
-      <Text style={[styles.text, getTextStyle()]}>{children}</Text>
+    <View style={[getBadgeStyle(), style]}>
+      <Text style={getTextStyle()}>{children}</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    alignSelf: "flex-start",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-  },
-  default: {
-    backgroundColor: "#22c55e",
-    borderColor: "#22c55e",
-  },
-  secondary: {
-    backgroundColor: "#64748b",
-    borderColor: "#64748b",
-  },
-  destructive: {
-    backgroundColor: "#ef4444",
-    borderColor: "#ef4444",
-  },
-  outline: {
-    backgroundColor: "transparent",
-    borderColor: "#334155",
-  },
-  text: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  defaultText: {
-    color: "#ffffff",
-  },
-  secondaryText: {
-    color: "#ffffff",
-  },
-  destructiveText: {
-    color: "#ffffff",
-  },
-  outlineText: {
-    color: "#f1f5f9",
-  },
-});
