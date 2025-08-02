@@ -4,22 +4,30 @@ import { useTheme } from "../../../contexts/ThemeContext";
 
 export default function TabLayout() {
   const { theme } = useTheme();
+  
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: theme.colors.background[0],
-          borderTopColor: theme.colors.border,
+          backgroundColor: theme.colors.surface.primary,
+          borderTopColor: theme.colors.border.primary,
+          borderTopWidth: 1,
           height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
+          paddingBottom: theme.spacing.sm,
+          paddingTop: theme.spacing.sm,
+          paddingHorizontal: theme.spacing.xs,
+          ...theme.shadows.lg,
         },
-        tabBarActiveTintColor: "#ff6b6b",
-        tabBarInactiveTintColor: "#8e8e93",
+        tabBarActiveTintColor: theme.colors.brand.primary,
+        tabBarInactiveTintColor: theme.colors.text.tertiary,
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "600",
+          fontSize: theme.typography.fontSizes.xs,
+          fontWeight: theme.typography.fontWeights.semibold,
+          marginTop: theme.spacing.xs,
+        },
+        tabBarIconStyle: {
+          marginBottom: 0,
         },
       }}
     >

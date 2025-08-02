@@ -35,7 +35,7 @@ const HomeScreen = () => {
       title: "Ponzi Simulator",
       description: "Experience how Ponzi schemes work from the inside",
       icon: Brain,
-      color: "#ff6b6b",
+      color: theme.colors.semantic.error,
       route: "/pages/PonziSimulator",
     },
     {
@@ -43,7 +43,7 @@ const HomeScreen = () => {
       title: "Red Flag Game",
       description: "Test your ability to spot fraud indicators",
       icon: Flag,
-      color: "#4ecdc4",
+      color: theme.colors.semantic.warning,
       route: "/pages/redflags",
     },
     {
@@ -51,7 +51,7 @@ const HomeScreen = () => {
       title: "Story Mode",
       description: "Learn through real-world case studies",
       icon: BookOpen,
-      color: "#45b7d1",
+      color: theme.colors.brand.primary,
       route: "/pages/story",
     },
     {
@@ -59,7 +59,7 @@ const HomeScreen = () => {
       title: "Education Center",
       description: "Comprehensive fraud awareness resources",
       icon: GraduationCap,
-      color: "#96ceb4",
+      color: theme.colors.semantic.success,
       route: "/(app)/(tabs)/education",
     },
   ];
@@ -72,7 +72,7 @@ const HomeScreen = () => {
 
   return (
     <LinearGradient
-      colors={[theme.colors.background[0], theme.colors.background[1]]}
+      colors={theme.colors.background.gradient}
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea}>
@@ -80,11 +80,11 @@ const HomeScreen = () => {
           {/* Header */}
           <View style={styles.header}>
             <View>
-              <Text style={[styles.greeting, { color: theme.colors.text }]}>
+              <Text style={[styles.greeting, { color: theme.colors.text.primary }]}>
                 Welcome back!
               </Text>
               <Text
-                style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+                style={[styles.subtitle, { color: theme.colors.text.secondary }]}
               >
                 Ready to expose some fraud?
               </Text>
@@ -96,7 +96,7 @@ const HomeScreen = () => {
 
           {/* Stats Section */}
           <View style={styles.statsContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
               Impact Statistics
             </Text>
             <View style={styles.statsRow}>
@@ -105,19 +105,19 @@ const HomeScreen = () => {
                   key={index}
                   style={[
                     styles.statCard,
-                    { backgroundColor: theme.colors.card },
+                    { backgroundColor: theme.colors.surface.primary },
                   ]}
                 >
-                  <stat.icon size={24} color="#4ecdc4" />
+                  <stat.icon size={24} color={theme.colors.brand.primary} />
                   <Text
-                    style={[styles.statValue, { color: theme.colors.text }]}
+                    style={[styles.statValue, { color: theme.colors.text.primary }]}
                   >
                     {stat.value}
                   </Text>
                   <Text
                     style={[
                       styles.statLabel,
-                      { color: theme.colors.textSecondary },
+                      { color: theme.colors.text.secondary },
                     ]}
                   >
                     {stat.label}
@@ -129,7 +129,7 @@ const HomeScreen = () => {
 
           {/* Features Grid */}
           <View style={styles.featuresContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
               Explore Features
             </Text>
             <View style={styles.featuresGrid}>
@@ -144,12 +144,12 @@ const HomeScreen = () => {
                     colors={[feature.color, `${feature.color}CC`]}
                     style={styles.featureGradient}
                   >
-                    <feature.icon size={32} color="black" />
-                    <Text style={[styles.featureTitle, { color: "black" }]}>
+                    <feature.icon size={32} color={theme.colors.text.inverse} />
+                    <Text style={[styles.featureTitle, { color: theme.colors.text.inverse }]}>
                       {feature.title}
                     </Text>
                     <Text
-                      style={[styles.featureDescription, { color: "black" }]}
+                      style={[styles.featureDescription, { color: theme.colors.text.inverse }]}
                     >
                       {feature.description}
                     </Text>
@@ -161,23 +161,23 @@ const HomeScreen = () => {
 
           {/* Quick Tips */}
           <View style={styles.tipsContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
               Daily Tip
             </Text>
             <View
-              style={[styles.tipCard, { backgroundColor: theme.colors.card }]}
+              style={[styles.tipCard, { backgroundColor: theme.colors.surface.primary }]}
             >
-              <Text style={[styles.tipIcon, { color: theme.colors.text }]}>
+              <Text style={[styles.tipIcon, { color: theme.colors.text.primary }]}>
                 💡
               </Text>
               <View style={styles.tipContent}>
-                <Text style={[styles.tipTitle, { color: theme.colors.text }]}>
+                <Text style={[styles.tipTitle, { color: theme.colors.text.primary }]}>
                   Red Flag Alert!
                 </Text>
                 <Text
                   style={[
                     styles.tipText,
-                    { color: theme.colors.textSecondary },
+                    { color: theme.colors.text.secondary },
                   ]}
                 >
                   If someone promises "guaranteed returns" with no risk, it's

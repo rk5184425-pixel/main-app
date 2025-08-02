@@ -1,50 +1,79 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  interpolateColor,
+} from "react-native-reanimated";
 import { useTheme } from "../contexts/ThemeContext";
 import { Moon, Sun } from "lucide-react-native";
 
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
 const ThemeToggle: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, isDark } = useTheme();
+  const scale = useSharedValue(1);
+  const rotation = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { scale: scale.value },
+        { rotate: `${rotation.value}deg` },
+      ],
+    };
+  });
+
+  const backgroundAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: interpolateColor(
+        isDark ? 1 : 0,
+        [0, 1],
+        [theme.colors.brand.accent, theme.colors.brand.primary]
+      ),
+    };
+  });
+
+  const handlePress = () => {
+    scale.value = withSpring(0.9, {}, () => {
+      scale.value = withSpring(1);
+    });
+    rotation.value = withTiming(rotation.value + 180, { duration: 300 });
+    toggleTheme();
+  };
+
+  const getToggleStyle = () => {
+    return {
+      width: 48,
+      height: 48,
+      borderRadius: theme.borderRadius.full,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      borderWidth: 2,
+      borderColor: theme.colors.border.primary,
+      ...theme.shadows.md,
+    };
+  };
 
   return (
-    <TouchableOpacity
+    <AnimatedTouchable
       style={[
-        styles.toggleButton,
-        {
-          backgroundColor: theme.colors.card,
-          borderColor: theme.colors.border,
-        },
+        getToggleStyle(),
+        backgroundAnimatedStyle,
+        animatedStyle,
       ]}
-      onPress={toggleTheme}
+      onPress={handlePress}
+      activeOpacity={0.8}
     >
-      <Text style={[styles.toggleText, { color: theme.colors.text }]}>
-        {theme.isDark ? (
-          <Moon size={24} color="white" />
-        ) : (
-          <Sun size={24} color="orange" />
-        )}
-      </Text>
-    </TouchableOpacity>
+      {isDark ? (
+        <Moon size={24} color={theme.colors.text.inverse} />
+      ) : (
+        <Sun size={24} color={theme.colors.text.inverse} />
+      )}
+    </AnimatedTouchable>
   );
 };
-
-const styles = StyleSheet.create({
-  toggleButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  toggleText: {
-    fontSize: 20,
-  },
-});
 
 export default ThemeToggle;

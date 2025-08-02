@@ -15,6 +15,10 @@ import {
   PiggyBank,
   Repeat,
 } from "lucide-react-native";
+import { useTheme } from "../contexts/ThemeContext";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/Card";
 import ResultsDisplay from "./ResultsDisplay";
 import { formatCurrency } from "../utils/formatters";
 
@@ -34,6 +38,7 @@ export interface CalculationResult {
 }
 
 const Calculator = () => {
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState("fd");
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(false);

@@ -25,6 +25,8 @@ import {
   File,
   Link,
 } from "lucide-react-native";
+import { useTheme } from "../../../contexts/ThemeContext";
+import ThemeToggle from "../../../components/ThemeToggle";
 import ChatbotButton from "../../../components/ChatbotButton";
 import ChatbotPopup from "../../../components/ChatbotPopup";
 
@@ -151,6 +153,7 @@ const CategoryHeader: React.FC<{
 );
 
 export default function SimulatorsScreen() {
+  const { theme } = useTheme();
   const [isPopupVisible, setPopupVisible] = useState(false);
   const fraudModules = simulatorModules.filter((m) => m.category === "fraud");
   const financialModules = simulatorModules.filter(

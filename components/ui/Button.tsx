@@ -16,6 +16,7 @@ import {
   GestureDetector,
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -23,30 +24,32 @@ interface ButtonProps {
   children: React.ReactNode;
   onPress?: () => void;
   variant?:
-    | "default"
-    | "destructive"
-    | "outline"
+    | "primary"
     | "secondary"
+    | "outline"
     | "ghost"
-    | "scan"
-    | "danger"
+    | "success"
     | "warning"
-    | "safe";
-  size?: "default" | "sm" | "lg" | "icon";
+    | "error"
+    | "info";
+  size?: "sm" | "md" | "lg" | "icon";
   disabled?: boolean;
   loading?: boolean;
   style?: any;
+  fullWidth?: boolean;
 }
 
 export function Button({
   children,
   onPress,
-  variant = "default",
-  size = "default",
+  variant = "primary",
+  size = "md",
   disabled = false,
   loading = false,
   style,
+  fullWidth = false,
 }: ButtonProps) {
+  const { theme } = useTheme();
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -66,83 +69,144 @@ export function Button({
     });
 
   const getButtonStyle = () => {
-    const baseStyle = [styles.button];
+    const baseStyle = {
+      borderRadius: theme.borderRadius.lg,
+      alignItems: "center" as const,
+      justifyContent: "center" as const,
+      flexDirection: "row" as const,
+      ...theme.shadows.md,
+    };
 
+    let variantStyle = {};
+    let sizeStyle = {};
+
+    // Variant styles
     switch (variant) {
-      case "destructive":
-        baseStyle.push({ ...styles.button, ...styles.destructive });
-        break;
-      case "outline":
-        baseStyle.push({ ...styles.button, ...styles.outline });
+      case "primary":
+        variantStyle = {
+          backgroundColor: theme.colors.brand.primary,
+        };
         break;
       case "secondary":
-        baseStyle.push({ ...styles.button, ...styles.secondary });
+        variantStyle = {
+          backgroundColor: theme.colors.interactive.secondary,
+        };
+        break;
+      case "outline":
+        variantStyle = {
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          borderColor: theme.colors.border.primary,
+          shadowOpacity: 0,
+          elevation: 0,
+        };
         break;
       case "ghost":
-        baseStyle.push({ ...styles.button, ...styles.ghost });
+        variantStyle = {
+          backgroundColor: "transparent",
+          shadowOpacity: 0,
+          elevation: 0,
+        };
         break;
-
-      case "scan":
-        baseStyle.push({ ...styles.button, ...styles.scan });
-        break;
-      case "danger":
-        baseStyle.push({ ...styles.button, ...styles.danger });
+      case "success":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.success,
+        };
         break;
       case "warning":
-        baseStyle.push({ ...styles.button, ...styles.warning });
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.warning,
+        };
         break;
-      case "safe":
-        baseStyle.push({ ...styles.button, ...styles.safe });
+      case "error":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.error,
+        };
         break;
-      default:
-        baseStyle.push({ ...styles.button, ...styles.default });
+      case "info":
+        variantStyle = {
+          backgroundColor: theme.colors.semantic.info,
+        };
+        break;
     }
 
+    // Size styles
     switch (size) {
       case "sm":
-        baseStyle.push({ ...styles.button, ...styles.sm });
+        sizeStyle = {
+          paddingHorizontal: theme.spacing.md,
+          paddingVertical: theme.spacing.sm,
+          minHeight: 40,
+        };
+        break;
+      case "md":
+        sizeStyle = {
+          paddingHorizontal: theme.spacing.lg,
+          paddingVertical: theme.spacing.md,
+          minHeight: 48,
+        };
         break;
       case "lg":
-        baseStyle.push({ ...styles.button, ...styles.lg });
+        sizeStyle = {
+          paddingHorizontal: theme.spacing.xl,
+          paddingVertical: theme.spacing.lg,
+          minHeight: 56,
+        };
         break;
       case "icon":
-        baseStyle.push({ ...styles.button, ...styles.icon });
+        sizeStyle = {
+          padding: theme.spacing.md,
+          minHeight: 48,
+          minWidth: 48,
+        };
         break;
-      default:
-        baseStyle.push({ ...styles.button, ...styles.defaultSize });
     }
 
-    if (disabled) {
-      baseStyle.push({ ...styles.button, ...styles.disabled });
-    }
+    const disabledStyle = disabled ? {
+      opacity: 0.5,
+      shadowOpacity: 0,
+      elevation: 0,
+    } : {};
 
-    return baseStyle;
+    const fullWidthStyle = fullWidth ? { width: "100%" } : {};
+
+    return {
+      ...baseStyle,
+      ...variantStyle,
+      ...sizeStyle,
+      ...disabledStyle,
+      ...fullWidthStyle,
+    };
   };
 
   const getTextStyle = () => {
-    const baseStyle = [styles.text];
+    let textColor = theme.colors.text.inverse;
+    let fontSize = theme.typography.fontSizes.base;
 
+    // Variant text colors
     switch (variant) {
       case "outline":
-        baseStyle.push({ ...styles.text, ...styles.outlineText });
-        break;
       case "ghost":
-        baseStyle.push({ ...styles.text, ...styles.ghostText });
+        textColor = theme.colors.text.primary;
         break;
-      default:
-        baseStyle.push({ ...styles.text, ...styles.defaultText });
     }
 
+    // Size text styles
     switch (size) {
       case "sm":
-        baseStyle.push({ ...styles.text, ...styles.smText });
+        fontSize = theme.typography.fontSizes.sm;
         break;
       case "lg":
-        baseStyle.push({ ...styles.text, ...styles.lgText });
+        fontSize = theme.typography.fontSizes.lg;
         break;
     }
 
-    return baseStyle;
+    return {
+      color: textColor,
+      fontSize,
+      fontWeight: theme.typography.fontWeights.semibold,
+      textAlign: "center" as const,
+    };
   };
 
   return (
@@ -151,11 +215,14 @@ export function Button({
         <AnimatedTouchable
           onPress={onPress}
           disabled={disabled || loading}
-          style={[animatedStyle, ...getButtonStyle(), style]}
+          style={[animatedStyle, getButtonStyle(), style]}
           activeOpacity={0.8}
         >
           {loading ? (
-            <ActivityIndicator color="white" size="small" />
+            <ActivityIndicator 
+              color={variant === "outline" || variant === "ghost" ? theme.colors.text.primary : theme.colors.text.inverse} 
+              size="small" 
+            />
           ) : (
             <Text style={getTextStyle()}>{children}</Text>
           )}
@@ -164,101 +231,3 @@ export function Button({
     </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  default: {
-    backgroundColor: "#10b981",
-    shadowColor: "#10b981",
-  },
-  destructive: {
-    backgroundColor: "#ef4444",
-    shadowColor: "#ef4444",
-  },
-  outline: {
-    borderWidth: 2,
-    borderColor: "#374151",
-    backgroundColor: "transparent",
-    shadowOpacity: 0.1,
-  },
-  secondary: {
-    backgroundColor: "#6b7280",
-    shadowColor: "#6b7280",
-  },
-  ghost: {
-    backgroundColor: "transparent",
-    shadowOpacity: 0,
-  },
-  scan: {
-    backgroundColor: "#10b981",
-    shadowColor: "#10b981",
-  },
-  danger: {
-    backgroundColor: "#dc2626",
-    shadowColor: "#dc2626",
-  },
-  warning: {
-    backgroundColor: "#f59e0b",
-    shadowColor: "#f59e0b",
-  },
-  safe: {
-    backgroundColor: "#059669",
-    shadowColor: "#059669",
-  },
-  defaultSize: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    minHeight: 48,
-  },
-  sm: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 40,
-  },
-  lg: {
-    paddingHorizontal: 32,
-    paddingVertical: 20,
-    minHeight: 56,
-  },
-  icon: {
-    padding: 12,
-    minHeight: 48,
-    minWidth: 48,
-  },
-  disabled: {
-    opacity: 0.5,
-    shadowOpacity: 0,
-  },
-  text: {
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  defaultText: {
-    color: "#ffffff",
-    fontSize: 16,
-  },
-  outlineText: {
-    color: "#f9fafb",
-    fontSize: 16,
-  },
-  ghostText: {
-    color: "#f9fafb",
-    fontSize: 16,
-  },
-  smText: {
-    fontSize: 14,
-  },
-  lgText: {
-    fontSize: 18,
-  },
-});

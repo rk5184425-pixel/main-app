@@ -7,12 +7,14 @@ import {
   ViewStyle,
 } from "react-native";
 import { MessageCircle } from "lucide-react-native";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface ChatbotButtonProps {
   onPress: () => void;
 }
 
 const ChatbotButton: React.FC<ChatbotButtonProps> = ({ onPress }) => {
+  const { theme } = useTheme();
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(100)).current; // Start off-screen
 
@@ -45,6 +47,19 @@ const ChatbotButton: React.FC<ChatbotButtonProps> = ({ onPress }) => {
     }).start();
   }, [pulseAnim, slideAnim]);
 
+  const getButtonStyle = () => {
+    return {
+      width: 56,
+      height: 56,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.brand.primary,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      ...theme.shadows.lg,
+      shadowColor: theme.colors.brand.primary,
+    };
+  };
+
   return (
     <Animated.View
       style={[
@@ -55,11 +70,11 @@ const ChatbotButton: React.FC<ChatbotButtonProps> = ({ onPress }) => {
       ]}
     >
       <TouchableOpacity
-        style={styles.button}
+        style={getButtonStyle()}
         onPress={onPress}
         activeOpacity={0.8}
       >
-        <MessageCircle color="#fff" size={24} />
+        <MessageCircle color={theme.colors.text.inverse} size={24} />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -72,22 +87,6 @@ const styles = StyleSheet.create({
     right: 24,
     zIndex: 1000,
   } as ViewStyle,
-  button: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#0070BA",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#0070BA",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
 });
 
 export default ChatbotButton;
