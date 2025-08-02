@@ -5,9 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Google from "expo-auth-session/providers/google";
 import { useDispatch } from "react-redux";
 import { signUp, login } from "../redux/services/operations/authServices";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function OAuthButtons() {
   const dispatch = useDispatch();
+  const { theme } = useTheme();
+  
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: "YOUR_EXPO_CLIENT_ID",
     iosClientId: "YOUR_IOS_CLIENT_ID",
@@ -29,43 +32,81 @@ export default function OAuthButtons() {
     }
   }, [response]);
 
+  const getSocialButtonStyle = () => {
+    return {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      justifyContent: "center" as const,
+      borderColor: theme.colors.border.primary,
+      borderWidth: 1.5,
+      borderRadius: theme.borderRadius.lg,
+      height: 52,
+      flex: 1,
+      marginHorizontal: theme.spacing.xs,
+      backgroundColor: theme.colors.surface.primary,
+      paddingHorizontal: theme.spacing.md,
+      ...theme.shadows.sm,
+    };
+  };
+
   return (
-    <View style={styles.row}>
-      <TouchableOpacity style={styles.socialButton} onPress={() => promptAsync()}>
-        <Ionicons name="logo-google" size={20} color="#DB4437" />
-        <Text style={styles.text}>Continue with Google</Text>
+    <View style={{ gap: theme.spacing.md }}>
+      <TouchableOpacity 
+        style={getSocialButtonStyle()} 
+        onPress={() => promptAsync()}
+        activeOpacity={0.8}
+      >
+        <View
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: theme.borderRadius.full,
+            backgroundColor: "#fff",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: theme.spacing.sm,
+          }}
+        >
+          <Ionicons name="logo-google" size={18} color="#DB4437" />
+        </View>
+        <Text
+          style={{
+            fontSize: theme.typography.fontSizes.base,
+            fontWeight: theme.typography.fontWeights.medium,
+            color: theme.colors.text.primary,
+          }}
+        >
+          Continue with Google
+        </Text>
       </TouchableOpacity>
-      {/* Facebook button logic will be similar */}
-      <TouchableOpacity style={styles.socialButton}>
-        <Ionicons name="logo-facebook" size={20} color="#4267B2" />
-        <Text style={styles.text}>Continue with Facebook</Text>
+
+      <TouchableOpacity 
+        style={getSocialButtonStyle()}
+        activeOpacity={0.8}
+      >
+        <View
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: theme.borderRadius.full,
+            backgroundColor: "#4267B2",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: theme.spacing.sm,
+          }}
+        >
+          <Ionicons name="logo-facebook" size={18} color="#fff" />
+        </View>
+        <Text
+          style={{
+            fontSize: theme.typography.fontSizes.base,
+            fontWeight: theme.typography.fontWeights.medium,
+            color: theme.colors.text.primary,
+          }}
+        >
+          Continue with Facebook
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  socialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "#ededef",
-    borderWidth: 1,
-    borderRadius: 10,
-    height: 50,
-    flex: 1,
-    marginHorizontal: 5,
-    backgroundColor: "#fff",
-  },
-  text: {
-    marginLeft: 8,
-    fontWeight: "500",
-    color: "#151717",
-  },
-});

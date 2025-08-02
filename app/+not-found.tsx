@@ -4,27 +4,148 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Home, AlertTriangle } from "lucide-react-native";
+import { useTheme } from "../contexts/ThemeContext";
+import { Button } from "../components/ui/Button";
+import { Card, CardContent } from "../components/ui/Card";
 
 export default function NotFoundScreen() {
+  const { theme } = useTheme();
+
   return (
-    <LinearGradient colors={["#1a1a2e", "#16213e"]} style={styles.container}>
+    <LinearGradient colors={theme.colors.background.gradient} style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
-          <AlertTriangle size={80} color="#ff6b6b" />
-          <Text style={styles.title}>404</Text>
-          <Text style={styles.subtitle}>Page Not Found</Text>
-          <Text style={styles.description}>
-            Oops! The page you're looking for doesn't exist.
+          {/* Error Icon */}
+          <View
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: theme.borderRadius.full,
+              backgroundColor: `${theme.colors.semantic.error}20`,
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: theme.spacing.xl,
+            }}
+          >
+            <AlertTriangle size={60} color={theme.colors.semantic.error} />
+          </View>
+
+          {/* Error Code */}
+          <Text
+            style={{
+              fontSize: theme.typography.fontSizes['4xl'],
+              fontWeight: theme.typography.fontWeights.bold,
+              color: theme.colors.text.primary,
+              marginBottom: theme.spacing.md,
+            }}
+          >
+            404
           </Text>
 
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={() => router.push("/(app)/(tabs)")}
-            activeOpacity={0.8}
+          {/* Error Title */}
+          <Text
+            style={{
+              fontSize: theme.typography.fontSizes['2xl'],
+              fontWeight: theme.typography.fontWeights.bold,
+              color: theme.colors.semantic.error,
+              marginBottom: theme.spacing.sm,
+            }}
           >
-            <Home size={20} color="white" />
-            <Text style={styles.homeButtonText}>Go Home</Text>
-          </TouchableOpacity>
+            Page Not Found
+          </Text>
+
+          {/* Error Description */}
+          <Text
+            style={{
+              fontSize: theme.typography.fontSizes.base,
+              color: theme.colors.text.secondary,
+              textAlign: "center",
+              lineHeight: theme.typography.fontSizes.base * theme.typography.lineHeights.normal,
+              marginBottom: theme.spacing['2xl'],
+              paddingHorizontal: theme.spacing.lg,
+            }}
+          >
+            Oops! The page you're looking for doesn't exist or has been moved to a different location.
+          </Text>
+
+          {/* Helpful Card */}
+          <Card style={{ marginBottom: theme.spacing.xl, width: "90%" }} variant="elevated">
+            <CardContent>
+              <Text
+                style={{
+                  fontSize: theme.typography.fontSizes.base,
+                  color: theme.colors.text.primary,
+                  fontWeight: theme.typography.fontWeights.medium,
+                  textAlign: "center",
+                  marginBottom: theme.spacing.sm,
+                }}
+              >
+                What you can do:
+              </Text>
+              <View style={{ gap: theme.spacing.sm }}>
+                <Text
+                  style={{
+                    fontSize: theme.typography.fontSizes.sm,
+                    color: theme.colors.text.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  • Check the URL for typos
+                </Text>
+                <Text
+                  style={{
+                    fontSize: theme.typography.fontSizes.sm,
+                    color: theme.colors.text.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  • Go back to the previous page
+                </Text>
+                <Text
+                  style={{
+                    fontSize: theme.typography.fontSizes.sm,
+                    color: theme.colors.text.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  • Return to the home screen
+                </Text>
+              </View>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons */}
+          <View style={{ gap: theme.spacing.md, width: "80%" }}>
+            <Button
+              onPress={() => router.push("/(app)/(tabs)")}
+              variant="primary"
+              size="lg"
+              fullWidth
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Home size={20} color={theme.colors.text.inverse} />
+                <Text
+                  style={{
+                    color: theme.colors.text.inverse,
+                    fontSize: theme.typography.fontSizes.base,
+                    fontWeight: theme.typography.fontWeights.semibold,
+                    marginLeft: theme.spacing.sm,
+                  }}
+                >
+                  Go to Home
+                </Text>
+              </View>
+            </Button>
+
+            <Button
+              onPress={() => router.back()}
+              variant="outline"
+              size="lg"
+              fullWidth
+            >
+              Go Back
+            </Button>
+          </View>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -43,38 +164,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 72,
-    fontWeight: "bold",
-    color: "white",
-    marginTop: 20,
-  },
-  subtitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#ff6b6b",
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: "#b8b8b8",
-    textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 40,
-  },
-  homeButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#4ecdc4",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  homeButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 8,
   },
 });
