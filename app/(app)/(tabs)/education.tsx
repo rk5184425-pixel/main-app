@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,10 +20,18 @@ import {
   Globe,
   Phone,
   Mail,
+  ChevronRight,
+  AlertTriangle,
+  Info,
 } from "lucide-react-native";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { Button } from "../../../components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card";
 import { router } from "expo-router";
 import LessonsPage from "../pages/LessonsPage";
+import ThemeToggle from "../../../components/ThemeToggle";
+
+const { width } = Dimensions.get("window");
 
 const EducationScreen = () => {
   const { theme } = useTheme();
@@ -37,6 +46,7 @@ const EducationScreen = () => {
         "A fraudulent investment operation that pays returns to existing investors using capital from new investors, rather than from legitimate business operations.",
       example:
         "Bernie Madoff's investment scandal was one of the largest Ponzi schemes in history.",
+      severity: "high" as const,
     },
     {
       term: "Pyramid Scheme",
@@ -44,419 +54,594 @@ const EducationScreen = () => {
         "A business model that recruits members via a promise of payments for enrolling others into the scheme, rather than supplying investments or sale of products.",
       example:
         "A pyramid scheme might involve members paying an entry fee and earning money solely by bringing in new recruits.",
+      severity: "high" as const,
     },
     {
       term: "Identity Theft",
       definition:
-        "The fraudulent acquisition and use of someone's personal information, usually for financial gain.",
+        "The fraudulent acquisition and use of a person's private identifying information, usually for financial gain.",
       example:
-        "Hackers used stolen social security numbers to open credit cards in victims’ names.",
+        "Criminals might steal your social security number to open credit cards in your name.",
+      severity: "critical" as const,
     },
     {
-      term: "Credit Card Fraud",
+      term: "Phishing",
       definition:
-        "Unauthorized use of another person's credit card information to make purchases or withdraw funds.",
+        "A cybercrime where targets are contacted by email, telephone, or text message by someone posing as a legitimate institution to lure individuals into providing sensitive data.",
       example:
-        "A fraudster used a skimming device at an ATM to steal card data and make unauthorized purchases.",
+        "Fake emails claiming to be from your bank asking you to verify your account details.",
+      severity: "high" as const,
     },
     {
-      term: "Phishing Scam",
+      term: "Social Engineering",
       definition:
-        "A cyber attack where criminals pose as legitimate institutions to lure individuals into providing sensitive data such as passwords and banking information.",
+        "The use of deception to manipulate individuals into divulging confidential or personal information that may be used for fraudulent purposes.",
       example:
-        "A victim received an email that looked like it was from their bank, asking them to confirm account details via a fake link.",
+        "A scammer calling and pretending to be from tech support to gain access to your computer.",
+      severity: "medium" as const,
     },
     {
       term: "Investment Fraud",
       definition:
-        "Deceptive practices to convince individuals to invest in worthless, nonexistent, or misrepresented investment opportunities.",
+        "An offer using false or fraudulent claims to solicit investments or loans, or providing for the purchase, use, or trade of forged or counterfeit securities.",
       example:
-        "The company promised unrealistic returns on fake cryptocurrency investments.",
-    },
-    {
-      term: "Mortgage Fraud",
-      definition:
-        "A type of fraud involving the misrepresentation of information to obtain a mortgage loan or better loan terms dishonestly.",
-      example:
-        "A buyer lied about their income and assets to get approved for a larger mortgage.",
-    },
-    {
-      term: "Tax Scam",
-      definition:
-        "A fraudulent scheme where scammers promise large tax refunds or reduced liabilities through false information or illegal methods.",
-      example:
-        "A fake tax preparer filed false returns to claim inflated deductions for clients and took a cut of the refunds.",
-    },
-    {
-      term: "Lottery and Sweepstakes Fraud",
-      definition:
-        "Scammers tell victims they’ve won a lottery or prize but must pay fees or taxes upfront to claim it.",
-      example:
-        "The victim received a letter claiming they won a foreign lottery and had to wire money for processing fees.",
-    },
-    {
-      term: "Charity Scam",
-      definition:
-        "Fraudulent solicitation of donations for causes that don’t exist or don’t benefit the stated beneficiaries.",
-      example:
-        "After a natural disaster, scammers created fake websites to collect donations from well-meaning individuals.",
-    },
-    {
-      term: "Debt Relief Scam",
-      definition:
-        "A scheme that falsely promises to reduce or eliminate a person’s debt in exchange for upfront fees, but delivers little or no actual relief.",
-      example:
-        "The company charged high fees and claimed they would negotiate with creditors but never followed through.",
-    },
-    {
-      term: "Fake Check Scam",
-      definition:
-        "A scam where the victim is sent a counterfeit check and asked to send back money before the check clears and bounces.",
-      example:
-        "A victim was hired for a mystery shopper job, sent a fake check, and asked to send back a portion in gift cards.",
-    },
-    {
-      term: "Online Banking Fraud",
-      definition:
-        "Unauthorized access to or manipulation of online banking accounts through hacking, phishing, or social engineering.",
-      example:
-        "Hackers used stolen credentials to transfer funds from the victim’s bank account to overseas accounts.",
-    },
-    {
-      term: "Employment Fraud",
-      definition:
-        "Scams involving fake job offers that require payment for training, equipment, or background checks, but never lead to actual employment.",
-      example:
-        "A victim paid for a work-from-home training kit that never arrived and was unable to contact the employer again.",
-    },
-    {
-      term: "Student Loan Scam",
-      definition:
-        "A fraud involving fake companies that offer to reduce or erase student loan debt in exchange for fees but provide no actual service.",
-      example:
-        "The student was tricked into paying a fee for loan forgiveness assistance that never materialized.",
-    },
-    {
-      term: "Old Tax Regime",
-      definition:
-        "A tax system where taxpayers can reduce their taxable income through various deductions such as under Sections 80C, 80D, HRA, LTA, and home loan interest.",
-      example:
-        "A taxpayer reduced their tax by ₹1.5L using 80C and another ₹2L using home loan interest.",
+        "Promises of guaranteed high returns with little to no risk involved.",
+      severity: "high" as const,
     },
   ];
 
-  const tips = [
+  const safetyTips = [
     {
-      title: "Verify Before You Invest",
-      description:
-        "Always check if the company is registered with SEBI, RBI, or other regulatory bodies.",
+      title: "Verify Before You Trust",
+      description: "Always verify the legitimacy of investment opportunities through independent research.",
       icon: Shield,
+      category: "investment",
     },
     {
       title: "Too Good to Be True",
-      description:
-        "If returns seem unrealistically high with no risk, it's likely a scam.",
-      icon: "⚠️",
+      description: "Be skeptical of investment opportunities that promise guaranteed high returns with no risk.",
+      icon: AlertTriangle,
+      category: "general",
     },
     {
-      title: "Pressure Tactics",
-      description:
-        "Legitimate investments don't require immediate decisions or high-pressure sales.",
-      icon: "⏰",
+      title: "Protect Personal Information",
+      description: "Never share sensitive personal or financial information over unsolicited calls or emails.",
+      icon: Info,
+      category: "privacy",
     },
     {
-      title: "Transparency Matters",
-      description:
-        "Real businesses provide clear information about their operations and financials.",
-      icon: "👁️",
+      title: "Research the Company",
+      description: "Check if the investment company is registered with relevant financial authorities.",
+      icon: Building2,
+      category: "investment",
     },
     {
-      title: "Recruitment Focus",
-      description:
-        "Be wary of schemes that emphasize recruiting others over actual products or services.",
-      icon: "👥",
-    },
-    {
-      title: "Documentation",
-      description:
-        "Always get proper documentation and receipts for any investment.",
-      icon: "📄",
+      title: "Seek Professional Advice",
+      description: "Consult with licensed financial advisors before making significant investment decisions.",
+      icon: GraduationCap,
+      category: "professional",
     },
   ];
 
   const resources = [
     {
-      title: "SEBI Investor Portal",
-      description:
-        "Securities and Exchange Board of India - Official investor protection portal",
-      url: "https://www.sebi.gov.in",
+      title: "SEC Investor.gov",
+      description: "Official SEC resource for investor education and protection",
+      url: "https://www.investor.gov/",
+      category: "government",
       icon: Building2,
     },
     {
-      title: "RBI Consumer Education",
-      description: "Reserve Bank of India - Banking and financial awareness",
-      url: "https://www.rbi.org.in",
-      icon: Building2,
-    },
-    {
-      title: "Cybercrime Reporting",
-      description: "Report financial fraud and cybercrime to authorities",
-      url: "https://cybercrime.gov.in",
+      title: "FTC Consumer Information",
+      description: "Federal Trade Commission's guide to avoiding scams",
+      url: "https://consumer.ftc.gov/",
+      category: "government",
       icon: Shield,
     },
     {
-      title: "PFMS Scholarship",
-      description:
-        "Public Financial Management System - Government schemes verification",
-      url: "https://pfms.nic.in",
+      title: "FINRA Investor Education",
+      description: "Financial Industry Regulatory Authority educational resources",
+      url: "https://www.finra.org/investors",
+      category: "financial",
       icon: GraduationCap,
+    },
+    {
+      title: "AARP Fraud Watch",
+      description: "Resources and tools to help you spot and avoid fraud",
+      url: "https://www.aarp.org/money/scams-fraud/",
+      category: "consumer",
+      icon: Globe,
     },
   ];
 
-  const handleLinkPress = (url: string) => {
-    Linking.openURL(url);
-  };
+  const emergencyContacts = [
+    {
+      title: "SEC Complaint Center",
+      contact: "1-800-SEC-0330",
+      type: "phone" as const,
+      description: "Report investment fraud",
+    },
+    {
+      title: "FTC Fraud Hotline",
+      contact: "1-877-FTC-HELP",
+      type: "phone" as const,
+      description: "Report consumer fraud",
+    },
+    {
+      title: "FBI IC3",
+      contact: "ic3.gov",
+      type: "web" as const,
+      description: "Internet Crime Complaint Center",
+    },
+  ];
 
-  const renderGlossary = () => (
-    <View>
-      {glossaryItems.map((item, index) => (
-        <View
-          key={index}
-          style={[
-            styles.glossaryCard,
-            {
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              borderWidth: 0.4,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            key={index}
-            onPress={() =>
-              router.push("/pages/FraudDetails?fraud=" + item.term)
-            }
-            activeOpacity={0.8}
-          >
+  const TabButton = ({ title, isActive, onPress }: { title: string; isActive: boolean; onPress: () => void }) => (
+    <TouchableOpacity
+      style={[
+        {
+          flex: 1,
+          paddingVertical: theme.spacing.md,
+          paddingHorizontal: theme.spacing.lg,
+          borderRadius: theme.borderRadius.lg,
+          marginHorizontal: theme.spacing.xs,
+          backgroundColor: isActive ? theme.colors.brand.primary : theme.colors.surface.secondary,
+          ...theme.shadows.sm,
+        }
+      ]}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <Text
+        style={{
+          textAlign: "center",
+          fontSize: theme.typography.fontSizes.sm,
+          fontWeight: theme.typography.fontWeights.semibold,
+          color: isActive ? theme.colors.text.inverse : theme.colors.text.secondary,
+        }}
+      >
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const GlossaryItem = ({ item }: { item: typeof glossaryItems[0] }) => {
+    const getSeverityColor = (severity: string) => {
+      switch (severity) {
+        case "critical":
+          return theme.colors.semantic.error;
+        case "high":
+          return theme.colors.semantic.warning;
+        case "medium":
+          return theme.colors.semantic.info;
+        default:
+          return theme.colors.text.tertiary;
+      }
+    };
+
+    return (
+      <Card style={{ marginBottom: theme.spacing.md }} animated>
+        <CardHeader>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <CardTitle size="sm">{item.term}</CardTitle>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
+                paddingHorizontal: theme.spacing.sm,
+                paddingVertical: theme.spacing.xs,
+                borderRadius: theme.borderRadius.full,
+                backgroundColor: `${getSeverityColor(item.severity)}20`,
               }}
             >
-              <Text style={[styles.glossaryTerm, { color: theme.colors.text }]}>
-                {item.term}
+              <Text
+                style={{
+                  fontSize: theme.typography.fontSizes.xs,
+                  fontWeight: theme.typography.fontWeights.medium,
+                  color: getSeverityColor(item.severity),
+                  textTransform: "uppercase",
+                }}
+              >
+                {item.severity}
               </Text>
-              <ExternalLink size={22} color={theme.colors.textSecondary} />
             </View>
+          </View>
+        </CardHeader>
+        <CardContent>
+          <Text
+            style={{
+              fontSize: theme.typography.fontSizes.base,
+              color: theme.colors.text.secondary,
+              lineHeight: theme.typography.fontSizes.base * theme.typography.lineHeights.normal,
+              marginBottom: theme.spacing.md,
+            }}
+          >
+            {item.definition}
+          </Text>
+          <View
+            style={{
+              padding: theme.spacing.md,
+              borderRadius: theme.borderRadius.md,
+              backgroundColor: theme.colors.surface.secondary,
+              borderLeftWidth: 4,
+              borderLeftColor: theme.colors.brand.primary,
+            }}
+          >
             <Text
-              style={[styles.glossaryDefinition, { color: theme.colors.text }]}
+              style={{
+                fontSize: theme.typography.fontSizes.sm,
+                fontWeight: theme.typography.fontWeights.medium,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing.xs,
+              }}
             >
-              {item.definition}
+              Example:
+            </Text>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.sm,
+                color: theme.colors.text.secondary,
+                fontStyle: "italic",
+              }}
+            >
+              {item.example}
+            </Text>
+          </View>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const SafetyTip = ({ tip }: { tip: typeof safetyTips[0] }) => (
+    <Card style={{ marginBottom: theme.spacing.md }} animated>
+      <CardContent>
+        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+          <View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: theme.borderRadius.full,
+              backgroundColor: `${theme.colors.brand.primary}20`,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: theme.spacing.md,
+            }}
+          >
+            <tip.icon size={24} color={theme.colors.brand.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.lg,
+                fontWeight: theme.typography.fontWeights.semibold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing.sm,
+              }}
+            >
+              {tip.title}
+            </Text>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.base,
+                color: theme.colors.text.secondary,
+                lineHeight: theme.typography.fontSizes.base * theme.typography.lineHeights.normal,
+              }}
+            >
+              {tip.description}
             </Text>
             <View
-              style={[
-                styles.exampleContainer,
-                {
-                  backgroundColor: theme.colors.surface,
-                  borderColor: theme.colors.border,
-                  borderWidth: 0.2,
-                },
-              ]}
+              style={{
+                alignSelf: "flex-start",
+                paddingHorizontal: theme.spacing.sm,
+                paddingVertical: theme.spacing.xs,
+                borderRadius: theme.borderRadius.md,
+                backgroundColor: theme.colors.surface.secondary,
+                marginTop: theme.spacing.sm,
+              }}
             >
-              <Text style={styles.exampleIcon}>💡</Text>
               <Text
-                style={[styles.glossaryExample, { color: theme.colors.text }]}
+                style={{
+                  fontSize: theme.typography.fontSizes.xs,
+                  fontWeight: theme.typography.fontWeights.medium,
+                  color: theme.colors.text.tertiary,
+                  textTransform: "capitalize",
+                }}
               >
-                {item.example}
+                {tip.category}
               </Text>
             </View>
-          </TouchableOpacity>
-        </View>
-      ))}
-      <View style={styles.emergencyCard}>
-        <Text style={styles.emergencyTitle}>🚨 Report Fraud Immediately</Text>
-        <Text style={styles.emergencyText}>
-          If you've been a victim of fraud or suspect fraudulent activity,
-          report it immediately through these official channels:
-        </Text>
-        <View style={styles.emergencyContacts}>
-          <View style={styles.contactItem}>
-            <Phone size={16} color="#EF4444" />
-            <Text style={styles.emergencyContact}>
-              Cyber Crime Helpline: 1930
-            </Text>
-          </View>
-          <View style={styles.contactItem}>
-            <Globe size={16} color="#EF4444" />
-            <Text style={styles.emergencyContact}>cybercrime.gov.in</Text>
-          </View>
-          <View style={styles.contactItem}>
-            <Mail size={16} color="#EF4444" />
-            <Text style={styles.emergencyContact}>
-              report.phishing@rbi.org.in
-            </Text>
           </View>
         </View>
-      </View>
-    </View>
+      </CardContent>
+    </Card>
   );
 
-  const renderTips = () => <LessonsPage />;
-
-  const renderResources = () => (
-    <View>
-      {resources.map((resource, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.resourceCard,
-            {
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              borderWidth: 0.4,
-            },
-          ]}
-          onPress={() => handleLinkPress(resource.url)}
-          activeOpacity={0.8}
-        >
-          <View style={styles.resourceHeader}>
-            <resource.icon size={24} color="#45b7d1" />
-            <View style={styles.resourceContent}>
-              <Text
-                style={[styles.resourceTitle, { color: theme.colors.text }]}
+  const ResourceItem = ({ resource }: { resource: typeof resources[0] }) => (
+    <TouchableOpacity
+      onPress={() => Linking.openURL(resource.url)}
+      activeOpacity={0.8}
+    >
+      <Card style={{ marginBottom: theme.spacing.md }} animated>
+        <CardContent>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: theme.borderRadius.lg,
+                  backgroundColor: `${theme.colors.semantic.info}20`,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: theme.spacing.md,
+                }}
               >
-                {resource.title}
-              </Text>
-              <Text
-                style={[
-                  styles.resourceDescription,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                {resource.description}
-              </Text>
+                <resource.icon size={20} color={theme.colors.semantic.info} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: theme.typography.fontSizes.base,
+                    fontWeight: theme.typography.fontWeights.semibold,
+                    color: theme.colors.text.primary,
+                    marginBottom: theme.spacing.xs,
+                  }}
+                >
+                  {resource.title}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: theme.typography.fontSizes.sm,
+                    color: theme.colors.text.secondary,
+                  }}
+                >
+                  {resource.description}
+                </Text>
+              </View>
             </View>
-            <ExternalLink size={22} color={theme.colors.textSecondary} />
+            <ChevronRight size={20} color={theme.colors.text.tertiary} />
           </View>
-        </TouchableOpacity>
-      ))}
-    </View>
+        </CardContent>
+      </Card>
+    </TouchableOpacity>
   );
+
+  const EmergencyContact = ({ contact }: { contact: typeof emergencyContacts[0] }) => (
+    <Card style={{ marginBottom: theme.spacing.md }} variant="outline" animated>
+      <CardContent>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: theme.borderRadius.full,
+              backgroundColor: `${theme.colors.semantic.error}20`,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: theme.spacing.md,
+            }}
+          >
+            {contact.type === "phone" ? (
+              <Phone size={20} color={theme.colors.semantic.error} />
+            ) : contact.type === "email" ? (
+              <Mail size={20} color={theme.colors.semantic.error} />
+            ) : (
+              <Globe size={20} color={theme.colors.semantic.error} />
+            )}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.base,
+                fontWeight: theme.typography.fontWeights.semibold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing.xs,
+              }}
+            >
+              {contact.title}
+            </Text>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.sm,
+                color: theme.colors.text.secondary,
+                marginBottom: theme.spacing.xs,
+              }}
+            >
+              {contact.description}
+            </Text>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.sm,
+                fontWeight: theme.typography.fontWeights.medium,
+                color: theme.colors.brand.primary,
+              }}
+            >
+              {contact.contact}
+            </Text>
+          </View>
+        </View>
+      </CardContent>
+    </Card>
+  );
+
+  const renderContent = () => {
+    switch (selectedTab) {
+      case "glossary":
+        return (
+          <View>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.lg,
+                fontWeight: theme.typography.fontWeights.semibold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing.lg,
+                textAlign: "center",
+              }}
+            >
+              Understanding Financial Fraud Terms
+            </Text>
+            {glossaryItems.map((item, index) => (
+              <GlossaryItem key={index} item={item} />
+            ))}
+          </View>
+        );
+
+      case "tips":
+        return (
+          <View>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.lg,
+                fontWeight: theme.typography.fontWeights.semibold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing.lg,
+                textAlign: "center",
+              }}
+            >
+              Essential Safety Tips
+            </Text>
+            {safetyTips.map((tip, index) => (
+              <SafetyTip key={index} tip={tip} />
+            ))}
+          </View>
+        );
+
+      case "resources":
+        return (
+          <View>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.lg,
+                fontWeight: theme.typography.fontWeights.semibold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing.sm,
+                textAlign: "center",
+              }}
+            >
+              Educational Resources
+            </Text>
+            <Text
+              style={{
+                fontSize: theme.typography.fontSizes.base,
+                color: theme.colors.text.secondary,
+                marginBottom: theme.spacing.xl,
+                textAlign: "center",
+              }}
+            >
+              Trusted sources for fraud prevention education
+            </Text>
+            {resources.map((resource, index) => (
+              <ResourceItem key={index} resource={resource} />
+            ))}
+
+            <View
+              style={{
+                marginTop: theme.spacing.xl,
+                padding: theme.spacing.lg,
+                borderRadius: theme.borderRadius.xl,
+                backgroundColor: `${theme.colors.semantic.error}10`,
+                borderWidth: 1,
+                borderColor: `${theme.colors.semantic.error}30`,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: theme.typography.fontSizes.lg,
+                  fontWeight: theme.typography.fontWeights.bold,
+                  color: theme.colors.semantic.error,
+                  marginBottom: theme.spacing.md,
+                  textAlign: "center",
+                }}
+              >
+                🚨 Emergency Contacts
+              </Text>
+              <Text
+                style={{
+                  fontSize: theme.typography.fontSizes.sm,
+                  color: theme.colors.text.secondary,
+                  marginBottom: theme.spacing.lg,
+                  textAlign: "center",
+                }}
+              >
+                If you suspect fraud, report it immediately
+              </Text>
+              {emergencyContacts.map((contact, index) => (
+                <EmergencyContact key={index} contact={contact} />
+              ))}
+            </View>
+          </View>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <LinearGradient
-      colors={[theme.colors.background[0], theme.colors.background[1]]}
+      colors={theme.colors.background.gradient}
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            Education Center
-          </Text>
-          <Text
-            style={[styles.subtitle, { color: theme.colors.textSecondary }]}
-          >
-            Learn to protect yourself from fraud
-          </Text>
+        {/* Header */}
+        <View style={[styles.header, { backgroundColor: theme.colors.surface.primary }]}>
+          <View style={styles.headerContent}>
+            <View style={styles.titleContainer}>
+              <GraduationCap size={32} color={theme.colors.brand.primary} />
+              <View style={{ marginLeft: theme.spacing.md }}>
+                <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>
+                  Education Center
+                </Text>
+                <Text style={[styles.headerSubtitle, { color: theme.colors.text.secondary }]}>
+                  Learn to protect yourself from fraud
+                </Text>
+              </View>
+            </View>
+            <ThemeToggle />
+          </View>
         </View>
 
         {/* Tab Navigation */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              {
-                backgroundColor: "#a59d9d24",
-                borderColor: theme.colors.border,
-                borderWidth: 0.3,
-              },
-              selectedTab === "glossary" && styles.activeTab,
-            ]}
+        <View style={[styles.tabContainer, { backgroundColor: theme.colors.surface.primary }]}>
+          <TabButton
+            title="Glossary"
+            isActive={selectedTab === "glossary"}
             onPress={() => setSelectedTab("glossary")}
-          >
-            <BookOpen
-              size={20}
-              color={selectedTab === "glossary" ? "white" : theme.colors.icon}
-            />
-            <Text
-              style={[
-                styles.tabText,
-                {
-                  color:
-                    selectedTab === "glossary" ? "white" : theme.colors.icon,
-                },
-              ]}
-            >
-              Glossary
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              {
-                backgroundColor: "#a59d9d24",
-                borderColor: theme.colors.border,
-                borderWidth: 0.3,
-              },
-              selectedTab === "tips" && styles.activeTab,
-            ]}
+          />
+          <TabButton
+            title="Safety Tips"
+            isActive={selectedTab === "tips"}
             onPress={() => setSelectedTab("tips")}
-          >
-            <Lightbulb
-              size={20}
-              color={selectedTab === "tips" ? "white" : theme.colors.icon}
-            />
-            <Text
-              style={[
-                styles.tabText,
-                {
-                  color: selectedTab === "tips" ? "white" : theme.colors.icon,
-                },
-              ]}
-            >
-              Tips
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              {
-                backgroundColor: "#a59d9d24",
-                borderColor: theme.colors.border,
-                borderWidth: 0.3,
-              },
-              selectedTab === "resources" && styles.activeTab,
-            ]}
+          />
+          <TabButton
+            title="Resources"
+            isActive={selectedTab === "resources"}
             onPress={() => setSelectedTab("resources")}
-          >
-            <ExternalLink
-              size={20}
-              color={selectedTab === "resources" ? "white" : theme.colors.icon}
-            />
-            <Text
-              style={[
-                styles.tabText,
-                {
-                  color:
-                    selectedTab === "resources" ? "white" : theme.colors.icon,
-                },
-              ]}
-            >
-              Resources
-            </Text>
-          </TouchableOpacity>
+          />
         </View>
 
         {/* Content */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {selectedTab === "glossary" && renderGlossary()}
-          {selectedTab === "tips" && renderTips()}
-          {selectedTab === "resources" && renderResources()}
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: theme.spacing['3xl'] }}
+        >
+          {renderContent()}
         </ScrollView>
+
+        {/* Lessons Button */}
+        <View style={[styles.bottomAction, { backgroundColor: theme.colors.surface.primary }]}>
+          <Button
+            onPress={() => router.push("/pages/LessonsPage" as any)}
+            variant="primary"
+            size="lg"
+            fullWidth
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <BookOpen size={20} color={theme.colors.text.inverse} style={{ marginRight: theme.spacing.sm }} />
+              <Text style={{ color: theme.colors.text.inverse, fontWeight: theme.typography.fontWeights.semibold }}>
+                Start Interactive Lessons
+              </Text>
+            </View>
+          </Button>
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -471,174 +656,60 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 30,
+    paddingVertical: 16,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  titleContainer: {
+    flexDirection: "row",
     alignItems: "center",
   },
-  title: {
-    fontSize: 32,
+  headerTitle: {
+    fontSize: 24,
     fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
   },
-  subtitle: {
-    fontSize: 16,
-    color: "#b8b8b8",
-    marginTop: 8,
-    textAlign: "center",
+  headerSubtitle: {
+    fontSize: 14,
+    marginTop: 2,
   },
   tabContainer: {
     flexDirection: "row",
     paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  tab: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    marginHorizontal: 4,
-  },
-  activeTab: {
-    backgroundColor: "#ff6b6b",
-  },
-  tabText: {
-    color: "#b8b8b8",
-    fontSize: 14,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  activeTabText: {
-    color: "white",
+    paddingVertical: 16,
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 20,
   },
-  glossaryCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 15,
-  },
-  glossaryTerm: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#4ecdc4",
-    marginBottom: 10,
-  },
-  glossaryDefinition: {
-    fontSize: 14,
-    color: "white",
-    lineHeight: 20,
-    marginBottom: 15,
-  },
-  exampleContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    backgroundColor: "rgba(255, 217, 61, 0.1)",
-    borderRadius: 8,
-    padding: 12,
-  },
-  exampleIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  glossaryExample: {
-    fontSize: 13,
-    color: "#b8b8b8",
-    fontStyle: "italic",
-    flex: 1,
-    lineHeight: 18,
-  },
-  tipCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 15,
-  },
-  tipHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  tipIconText: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
-    marginLeft: 12,
-  },
-  tipDescription: {
-    fontSize: 14,
-    color: "#b8b8b8",
-    lineHeight: 20,
-  },
-  resourceCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 15,
-  },
-  resourceHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  resourceContent: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  resourceTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 4,
-  },
-  resourceDescription: {
-    fontSize: 14,
-    color: "#b8b8b8",
-    lineHeight: 18,
-  },
-  emergencyCard: {
-    backgroundColor: "#FEF2F2",
-    marginHorizontal: 2,
-    marginBottom: 24,
-    padding: 24,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#FECACA",
-  },
-  emergencyTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#DC2626",
-    marginBottom: 12,
-  },
-  emergencyText: {
-    fontSize: 14,
-    color: "#7F1D1D",
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  emergencyContacts: {
-    gap: 8,
-  },
-  contactItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  emergencyContact: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#7F1D1D",
+  bottomAction: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
 });
 
