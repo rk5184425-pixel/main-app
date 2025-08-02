@@ -1,34 +1,22 @@
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFrameworkReady } from "../hooks/useFrameworkReady";
-import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
-import { Provider, useDispatch } from "react-redux";
+import { ThemeProvider } from "../contexts/ThemeContext";
+import { Provider } from "react-redux";
+import { AuthProvider } from "../contexts/AuthContext";
 import store from "../redux/store";
-import { useEffect } from "react";
-import { initializeAuth } from "../redux/services/operations/initAuth";
-
 
 function MainLayout() {
   useFrameworkReady();
-  const dispatch = useDispatch();
-  
-  // Initialize auth state from AsyncStorage when app starts
-  useEffect(() => {
-    dispatch(initializeAuth());
-  }, [dispatch]);
 
   return (
     <ThemeProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-          {/* <Stack.Screen name="pages/story" />
-          <Stack.Screen name="pages/redflags" /> */}
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="light" backgroundColor="#1a1a2e" />
+        <AuthProvider>
+          <Slot />
+          <StatusBar style="light" backgroundColor="#1a1a2e" />
+        </AuthProvider>
       </GestureHandlerRootView>
     </ThemeProvider>
   );

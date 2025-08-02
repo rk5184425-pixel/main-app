@@ -244,7 +244,7 @@ const RedFlagsGame = () => {
 
                 <TouchableOpacity
                   style={[styles.resultButton, { backgroundColor: "#45b7d1" }]}
-                  onPress={() => router.push("/(tabs)/education")}
+                  onPress={() => router.push("/(app)/(tabs)/education")}
                 >
                   <GraduationCap size={20} color="white" />
                   <Text style={styles.resultButtonText}>Learn More</Text>

@@ -20,7 +20,7 @@ const ResetPassword = ({ onBackToLogin }) => {
     if (token) {
       // Import router dynamically to avoid circular dependencies
       import("expo-router").then(({ router }) => {
-        router.push('/(tabs)');
+        router.push('/(app)/(tabs)');
       });
     }
   }, [token]);

@@ -57,7 +57,7 @@ const HomeScreen = () => {
       description: "Comprehensive fraud awareness resources",
       icon: GraduationCap,
       color: "#96ceb4",
-      route: "/(tabs)/education",
+      route: "/(app)/(tabs)/education",
     },
   ];
 

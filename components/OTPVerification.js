@@ -76,7 +76,7 @@ const OTPVerification = ({ onBackToSignup, onVerificationComplete }) => {
         console.log('[OTP] Step 4: Redirecting to Tabs page');
         // Import router dynamically to avoid circular dependencies
         const { router } = await import("expo-router");
-        router.push('/(tabs)');
+        router.push('/(app)/(tabs)');
       } else {
         // If no token was returned, still call the original callback
         onVerificationComplete();
