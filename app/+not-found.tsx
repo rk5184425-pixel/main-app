@@ -19,7 +19,7 @@ export default function NotFoundScreen() {
 
           <TouchableOpacity
             style={styles.homeButton}
-            onPress={() => router.push("/(tabs)")}
+            onPress={() => router.push("/(app)/(tabs)")}
             activeOpacity={0.8}
           >
             <Home size={20} color="white" />

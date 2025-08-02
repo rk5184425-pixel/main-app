@@ -17,7 +17,7 @@ import {
 
 export default function RevelationScreen() {
   const handleRestart = () => {
-    router.replace("/(tabs)");
+    router.replace("/(app)/(tabs)");
   };
 
   const redFlags = [
