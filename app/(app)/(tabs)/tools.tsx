@@ -57,6 +57,14 @@ const simulatorModules: SimulatorModule[] = [
     category: "fraud",
     route: "/pages/UrlAnalysisTool",
   },
+  {
+    id: "nearest-cybercell-finder",
+    title: "Nearest Cybercell Finder",
+    description: "Find the nearest cybercell to your location",
+    icon: Link,
+    category: "fraud",
+    route: "/pages/NearestCybercellFinder",
+  },
 
   {
     id: "sip-calculator",

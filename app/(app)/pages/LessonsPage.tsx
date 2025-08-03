@@ -178,14 +178,14 @@ export default function LessonsPage() {
 
         {/* Courses Section */}
         <View style={styles.coursesSection}>
-          <View style={styles.sectionHeader}>
+          {/* <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Your Learning Journey</Text>
             <Text style={styles.sectionDescription}>
               Master essential financial skills through our structured learning
               paths. Each course builds upon the previous, creating a
               comprehensive financial education.
             </Text>
-          </View>
+          </View> */}
 
           <View style={styles.coursesGrid}>
             {courses.map((course) => (

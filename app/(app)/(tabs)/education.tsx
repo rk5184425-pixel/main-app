@@ -27,8 +27,8 @@ import LessonsPage from "../pages/LessonsPage";
 const EducationScreen = () => {
   const { theme } = useTheme();
   const [selectedTab, setSelectedTab] = useState<
-    "glossary" | "tips" | "resources"
-  >("glossary");
+    "glossary" | "lessons" | "resources"
+  >("lessons");
 
   const glossaryItems = [
     {
@@ -142,45 +142,6 @@ const EducationScreen = () => {
         "A tax system where taxpayers can reduce their taxable income through various deductions such as under Sections 80C, 80D, HRA, LTA, and home loan interest.",
       example:
         "A taxpayer reduced their tax by ₹1.5L using 80C and another ₹2L using home loan interest.",
-    },
-  ];
-
-  const tips = [
-    {
-      title: "Verify Before You Invest",
-      description:
-        "Always check if the company is registered with SEBI, RBI, or other regulatory bodies.",
-      icon: Shield,
-    },
-    {
-      title: "Too Good to Be True",
-      description:
-        "If returns seem unrealistically high with no risk, it's likely a scam.",
-      icon: "⚠️",
-    },
-    {
-      title: "Pressure Tactics",
-      description:
-        "Legitimate investments don't require immediate decisions or high-pressure sales.",
-      icon: "⏰",
-    },
-    {
-      title: "Transparency Matters",
-      description:
-        "Real businesses provide clear information about their operations and financials.",
-      icon: "👁️",
-    },
-    {
-      title: "Recruitment Focus",
-      description:
-        "Be wary of schemes that emphasize recruiting others over actual products or services.",
-      icon: "👥",
-    },
-    {
-      title: "Documentation",
-      description:
-        "Always get proper documentation and receipts for any investment.",
-      icon: "📄",
     },
   ];
 
@@ -303,7 +264,7 @@ const EducationScreen = () => {
     </View>
   );
 
-  const renderTips = () => <LessonsPage />;
+  const renderLessons = () => <LessonsPage />;
 
   const renderResources = () => (
     <View>
@@ -358,12 +319,40 @@ const EducationScreen = () => {
           <Text
             style={[styles.subtitle, { color: theme.colors.textSecondary }]}
           >
-            Learn to protect yourself from fraud
+            Master essential skills through our structured learning modules.
           </Text>
         </View>
 
         {/* Tab Navigation */}
         <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              {
+                backgroundColor: "#a59d9d24",
+                borderColor: theme.colors.border,
+                borderWidth: 0.3,
+              },
+              selectedTab === "lessons" && styles.activeTab,
+            ]}
+            onPress={() => setSelectedTab("lessons")}
+          >
+            <Lightbulb
+              size={20}
+              color={selectedTab === "lessons" ? "white" : theme.colors.icon}
+            />
+            <Text
+              style={[
+                styles.tabText,
+                {
+                  color:
+                    selectedTab === "lessons" ? "white" : theme.colors.icon,
+                },
+              ]}
+            >
+              Lessons
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.tab,
@@ -401,34 +390,6 @@ const EducationScreen = () => {
                 borderColor: theme.colors.border,
                 borderWidth: 0.3,
               },
-              selectedTab === "tips" && styles.activeTab,
-            ]}
-            onPress={() => setSelectedTab("tips")}
-          >
-            <Lightbulb
-              size={20}
-              color={selectedTab === "tips" ? "white" : theme.colors.icon}
-            />
-            <Text
-              style={[
-                styles.tabText,
-                {
-                  color: selectedTab === "tips" ? "white" : theme.colors.icon,
-                },
-              ]}
-            >
-              Tips
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              {
-                backgroundColor: "#a59d9d24",
-                borderColor: theme.colors.border,
-                borderWidth: 0.3,
-              },
               selectedTab === "resources" && styles.activeTab,
             ]}
             onPress={() => setSelectedTab("resources")}
@@ -454,7 +415,7 @@ const EducationScreen = () => {
         {/* Content */}
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {selectedTab === "glossary" && renderGlossary()}
-          {selectedTab === "tips" && renderTips()}
+          {selectedTab === "lessons" && renderLessons()}
           {selectedTab === "resources" && renderResources()}
         </ScrollView>
       </SafeAreaView>
