@@ -18,6 +18,7 @@ import {
   Eye,
   Shield,
   TrendingUp,
+  Target,
 } from "lucide-react-native";
 import { useTheme } from "../../../contexts/ThemeContext";
 import ThemeToggle from "../../../components/ThemeToggle";
@@ -51,17 +52,10 @@ const HomeScreen = () => {
     //   title: "Red Flag Game",
     //   description: "Test your ability to spot fraud indicators",
     //   icon: Flag,
-    //   color: "#4ecdc4",
+    //   color: "#ecdc44",
     //   route: "/pages/redflags",
     // },
-    {
-      id: 3,
-      title: "Story Mode",
-      description: "Learn through real-world case studies",
-      icon: BookOpen,
-      color: "#45b7d1",
-      route: "/pages/story",
-    },
+
     {
       id: 4,
       title: "Education Center",
@@ -69,6 +63,14 @@ const HomeScreen = () => {
       icon: GraduationCap,
       color: "#96ceb4",
       route: "/(app)/(tabs)/education",
+    },
+    {
+      id: 5,
+      title: "Story Mode",
+      description: "Practice real-world financial decisions",
+      icon: Target,
+      color: "#ecdc44",
+      route: "/pages/ScenarioHub",
     },
   ];
 

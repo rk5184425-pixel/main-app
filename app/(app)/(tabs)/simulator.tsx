@@ -98,42 +98,6 @@ const simulatorModules: SimulatorModule[] = [
     category: "fraud",
     route: "/pages/loanScamSimulator",
   },
-  {
-    id: "portfolio-management",
-    title: "Portfolio Optimization",
-    description:
-      "Build and optimize investment portfolios using modern portfolio theory",
-    icon: PieChart,
-    category: "financial",
-    route: "/simulators/portfolio-management",
-  },
-  {
-    id: "risk-assessment",
-    title: "Risk Assessment & Management",
-    description:
-      "Evaluate and manage financial risks using quantitative models",
-    icon: BarChart3,
-    category: "financial",
-    route: "/simulators/risk-assessment",
-  },
-  {
-    id: "market-analysis",
-    title: "Market Trend Analysis",
-    description:
-      "Analyze market trends and make data-driven investment decisions",
-    icon: TrendingUp,
-    category: "financial",
-    route: "/simulators/market-analysis",
-  },
-  {
-    id: "loan-calculator",
-    title: "Advanced Loan Modeling",
-    description:
-      "Create sophisticated loan models with risk assessment capabilities",
-    icon: Calculator,
-    category: "financial",
-    route: "/simulators/loan-calculator",
-  },
 ];
 
 const getDifficultyColor = (difficulty: string) => {
@@ -286,7 +250,7 @@ export default function SimulatorsScreen() {
         </View>
 
         {/* Financial Analysis Section */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <CategoryHeader
             title="Financial Analysis & Modeling"
             subtitle="Build expertise in financial markets"
@@ -298,7 +262,7 @@ export default function SimulatorsScreen() {
               <ModuleCard key={module.id} module={module} index={index} />
             ))}
           </View>
-        </View>
+        </View> */}
       </ScrollView>
       {/* Floating Chatbot Button */}
       <ChatbotButton onPress={() => setPopupVisible(true)} />

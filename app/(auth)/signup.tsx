@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import SignupForm from "../../components/SignupForm";
@@ -13,7 +13,7 @@ export default function SignupScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Ionicons name="shield-checkmark" size={40} color="#151717" />
@@ -22,9 +22,9 @@ export default function SignupScreen() {
       </View>
 
       {/* Form Container */}
-      <View style={styles.formContainer}>
+      <ScrollView style={styles.formContainer}>
         <SignupForm onSignupSuccess={handleSignupSuccess} />
-      </View>
+      </ScrollView>
     </View>
   );
 }
