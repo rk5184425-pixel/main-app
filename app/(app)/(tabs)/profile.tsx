@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   Image,
+  Animated,
+  Easing,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,6 +26,9 @@ import {
   LogOut,
   Shield,
   GraduationCap,
+  Sparkles,
+  Star,
+  Zap,
 } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +41,33 @@ const ProfileScreen = () => {
   const { signOut } = useAuth();
   const userProfile = useSelector((state: any) => state.profile?.user);
   const [userData, setUserData] = useState(null);
+  const [animatedValues] = useState({
+    fadeAnim: new Animated.Value(0),
+    slideAnim: new Animated.Value(30),
+    scaleAnim: new Animated.Value(0.8),
+  });
+
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(animatedValues.fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(animatedValues.slideAnim, {
+        toValue: 0,
+        duration: 600,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.spring(animatedValues.scaleAnim, {
+        toValue: 1,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -68,17 +100,18 @@ const ProfileScreen = () => {
   };
 
   const badges = [
-    { name: "Red Flag Spotter", icon: Flag, color: "#ff6b6b", earned: true },
-    { name: "Collapse Survivor", icon: Shield, color: "#4ecdc4", earned: true },
-    { name: "Financial Detective", icon: "🔍", color: "#45b7d1", earned: true },
-    { name: "Story Master", icon: BookOpen, color: "#96ceb4", earned: true },
-    { name: "Scheme Buster", icon: "⚖️", color: "#ffd93d", earned: true },
-    { name: "Fraud Fighter", icon: "🛡️", color: "#ff9ff3", earned: true },
-    { name: "Awareness Champion", icon: "📢", color: "#54a0ff", earned: false },
+    { name: "Red Flag Spotter", icon: Flag, color: "#ef4444", gradient: ["#ef4444", "#dc2626"], earned: true },
+    { name: "Collapse Survivor", icon: Shield, color: "#10b981", gradient: ["#10b981", "#059669"], earned: true },
+    { name: "Financial Detective", icon: "🔍", color: "#6366f1", gradient: ["#6366f1", "#4338ca"], earned: true },
+    { name: "Story Master", icon: BookOpen, color: "#8b5cf6", gradient: ["#8b5cf6", "#7c3aed"], earned: true },
+    { name: "Scheme Buster", icon: "⚖️", color: "#f59e0b", gradient: ["#f59e0b", "#d97706"], earned: true },
+    { name: "Fraud Fighter", icon: "🛡️", color: "#06b6d4", gradient: ["#06b6d4", "#0891b2"], earned: true },
+    { name: "Awareness Champion", icon: "📢", color: "#ec4899", gradient: ["#ec4899", "#db2777"], earned: false },
     {
       name: "Master Educator",
       icon: GraduationCap,
-      color: "#5f27cd",
+      color: "#7c3aed",
+      gradient: ["#7c3aed", "#6d28d9"],
       earned: false,
     },
   ];
@@ -88,16 +121,19 @@ const ProfileScreen = () => {
       title: "First Simulation",
       description: "Completed your first Ponzi scheme simulation",
       date: "2024-01-15",
+      color: "#10b981",
     },
     {
       title: "Red Flag Expert",
       description: "Spotted 50 red flags in the detection game",
       date: "2024-01-20",
+      color: "#f59e0b",
     },
     {
       title: "Story Enthusiast",
       description: "Completed 10 story mode scenarios",
       date: "2024-01-25",
+      color: "#6366f1",
     },
   ];
 
@@ -127,127 +163,706 @@ const ProfileScreen = () => {
     (userStats.experiencePoints / userStats.nextLevelXP) * 100;
 
   return (
-    <LinearGradient colors={["#1a1a2e", "#16213e"]} style={styles.container}>
+    <LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.avatarContainer}>
-              {userData?.avatar ? (
-                <Image
-                  source={{ uri: userData.avatar }}
-                  style={styles.avatar}
-                  resizeMode="cover"
-                />
-              ) : (
-                <LinearGradient
-                  colors={["#ff6b6b", "#4ecdc4"]}
-                  style={styles.avatar}
-                >
-                  <User size={40} color="white" />
-                </LinearGradient>
-              )}
-            </View>
-            <Text style={styles.userName}>
-              {userData
-                ? `${userData.firstName || ""} ${
-                    userData.lastName || ""
-                  }`.trim()
-                : "Fraud Fighter"}
-            </Text>
-            <Text style={styles.userLevel}>{userStats.currentLevel}</Text>
-          </View>
+          <Animated.View
+            style={[
+              styles.header,
+              {
+                opacity: animatedValues.fadeAnim,
+                transform: [{ translateY: animatedValues.slideAnim }],
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={["#1e293b", "#334155"]}
+              style={styles.headerGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.avatarContainer}>
+                {userData?.avatar ? (
+                  <View style={styles.avatarWrapper}>
+                    <Image
+                      source={{ uri: userData.avatar }}
+                      style={styles.avatar}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.avatarGlow} />
+                  </View>
+                ) : (
+                  <LinearGradient
+                    colors={["#6366f1", "#8b5cf6"]}
+                    style={styles.avatar}
+                  >
+                    <User size={40} color="white" />
+                    <Animated.View
+                      style={[
+                        styles.sparkleOverlay,
+                        {
+                          opacity: animatedValues.scaleAnim,
+                        },
+                      ]}
+                    >
+                      <Sparkles size={16} color="#fbbf24" />
+                    </Animated.View>
+                  </LinearGradient>
+                )}
+              </View>
+              <View style={styles.userInfo}>
+                <View style={styles.nameContainer}>
+                  <Text style={styles.userName}>
+                    {userData
+                      ? `${userData.firstName || ""} ${
+                          userData.lastName || ""
+                        }`.trim()
+                      : "Fraud Fighter"}
+                  </Text>
+                  <Star size={20} color="#fbbf24" />
+                </View>
+                <View style={styles.levelContainer}>
+                  <Zap size={16} color="#60a5fa" />
+                  <Text style={styles.userLevel}>{userStats.currentLevel}</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </Animated.View>
 
           {/* Progress Section */}
-          <View style={styles.progressContainer}>
-            <Text style={styles.sectionTitle}>Progress</Text>
-            <View style={styles.progressCard}>
+          <Animated.View
+            style={[
+              styles.progressContainer,
+              {
+                opacity: animatedValues.fadeAnim,
+                transform: [{ scale: animatedValues.scaleAnim }],
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={["#1e293b", "#334155"]}
+              style={styles.progressCard}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
               <View style={styles.progressHeader}>
-                <Text style={styles.progressText}>
-                  {userStats.experiencePoints} / {userStats.nextLevelXP} XP
-                </Text>
-                <Text style={styles.progressPercentage}>
-                  {Math.round(progressPercentage)}%
+                <Trophy size={20} color="#fbbf24" />
+                <Text style={styles.sectionTitle}>Your Progress</Text>
+              </View>
+              <View style={styles.progressDetails}>
+                <View style={styles.progressInfo}>
+                  <Text style={styles.progressText}>
+                    {userStats.experiencePoints} / {userStats.nextLevelXP} XP
+                  </Text>
+                  <Text style={styles.progressPercentage}>
+                    {Math.round(progressPercentage)}%
+                  </Text>
+                </View>
+                <View style={styles.progressBar}>
+                  <Animated.View
+                    style={[
+                      styles.progressFill,
+                      {
+                        width: `${progressPercentage}%`,
+                        opacity: animatedValues.scaleAnim,
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressLabel}>
+                  {userStats.nextLevelXP - userStats.experiencePoints} XP to next
+                  level
                 </Text>
               </View>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${progressPercentage}%` },
-                  ]}
-                />
-              </View>
-              <Text style={styles.progressLabel}>
-                {userStats.nextLevelXP - userStats.experiencePoints} XP to next
-                level
-              </Text>
-            </View>
-          </View>
+            </LinearGradient>
+          </Animated.View>
 
           {/* Stats Section */}
-          <View style={styles.statsContainer}>
-            <Text style={styles.sectionTitle}>Your Stats</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}>
-                <Brain size={24} color="#ff6b6b" />
-                <Text style={styles.statValue}>{userStats.schemesExposed}</Text>
-                <Text style={styles.statLabel}>Schemes Exposed</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Flag size={24} color="#4ecdc4" />
-                <Text style={styles.statValue}>
-                  {userStats.redFlagsSpotted}
-                </Text>
-                <Text style={styles.statLabel}>Red Flags Spotted</Text>
-              </View>
-              <View style={styles.statCard}>
-                <BookOpen size={24} color="#45b7d1" />
-                <Text style={styles.statValue}>
-                  {userStats.storiesCompleted}
-                </Text>
-                <Text style={styles.statLabel}>Stories Completed</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Trophy size={24} color="#ffd93d" />
-                <Text style={styles.statValue}>{userStats.badgesEarned}</Text>
-                <Text style={styles.statLabel}>Badges Earned</Text>
-              </View>
+          <Animated.View
+            style={[
+              styles.statsContainer,
+              {
+                opacity: animatedValues.fadeAnim,
+                transform: [{ translateY: animatedValues.slideAnim }],
+              },
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Brain size={20} color="#60a5fa" />
+              <Text style={styles.sectionTitle}>Your Stats</Text>
             </View>
-          </View>
+            <View style={styles.statsGrid}>
+              {[
+                { icon: Brain, value: userStats.schemesExposed, label: "Schemes Exposed", color: "#6366f1" },
+                { icon: Flag, value: userStats.redFlagsSpotted, label: "Red Flags Spotted", color: "#ef4444" },
+                { icon: BookOpen, value: userStats.storiesCompleted, label: "Stories Completed", color: "#10b981" },
+                { icon: Trophy, value: userStats.badgesEarned, label: "Badges Earned", color: "#f59e0b" },
+              ].map((stat, index) => (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.statCard,
+                    {
+                      transform: [
+                        {
+                          translateY: animatedValues.slideAnim.interpolate({
+                            inputRange: [0, 30],
+                            outputRange: [0, 20 + index * 5],
+                          }),
+                        },
+                      ],
+                    },
+                  ]}
+                >
+                  <LinearGradient
+                    colors={[stat.color + "20", stat.color + "10"]}
+                    style={styles.statCardGradient}
+                  >
+                    <View style={[styles.statIconContainer, { backgroundColor: stat.color + "20" }]}>
+                      <stat.icon size={24} color={stat.color} />
+                    </View>
+                    <Text style={styles.statValue}>{stat.value}</Text>
+                    <Text style={styles.statLabel}>{stat.label}</Text>
+                  </LinearGradient>
+                </Animated.View>
+              ))}
+            </View>
+          </Animated.View>
 
           {/* Badges Section */}
-          <View style={styles.badgesContainer}>
-            <Text style={styles.sectionTitle}>Badges Collection</Text>
+          <Animated.View
+            style={[
+              styles.badgesContainer,
+              {
+                opacity: animatedValues.fadeAnim,
+                transform: [{ translateY: animatedValues.slideAnim }],
+              },
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Award size={20} color="#fbbf24" />
+              <Text style={styles.sectionTitle}>Badges Collection</Text>
+            </View>
             <View style={styles.badgesGrid}>
               {badges.map((badge, index) => (
-                <View
+                <Animated.View
                   key={index}
                   style={[
                     styles.badgeCard,
                     !badge.earned && styles.badgeCardLocked,
+                    {
+                      transform: [
+                        {
+                          scale: animatedValues.scaleAnim.interpolate({
+                            inputRange: [0.8, 1],
+                            outputRange: [0.8, badge.earned ? 1 : 0.9],
+                          }),
+                        },
+                      ],
+                    },
                   ]}
-                >
-                  {typeof badge.icon === "string" ? (
+                </LinearGradient>
+                  <LinearGradient
+                    colors={badge.earned ? badge.gradient : ["#374151", "#4b5563"]}
+                    style={styles.badgeCardGradient}
+                  >
+                    {typeof badge.icon === "string" ? (
+                      <Text
+                        style={[
+                          styles.badgeIconText,
+                          { opacity: badge.earned ? 1 : 0.5 },
+                        ]}
+                      >
+                        {badge.icon}
+                      </Text>
+                    ) : (
+                      <badge.icon
+                        size={24}
+                        color={badge.earned ? "#ffffff" : "#6b7280"}
+                      />
+                    )}
                     <Text
                       style={[
-                        styles.badgeIconText,
-                        { color: badge.earned ? badge.color : "#666" },
+                        styles.badgeName,
+                        !badge.earned && styles.badgeNameLocked,
                       ]}
                     >
-                      {badge.icon}
+                      {badge.name}
                     </Text>
-                  ) : (
-                    <badge.icon
-                      size={24}
-                      color={badge.earned ? badge.color : "#666"}
-                    />
-                  )}
-                  <Text
-                    style={[
-                      styles.badgeName,
-                      !badge.earned && styles.badgeNameLocked,
-                    ]}
+                    {badge.earned && (
+                      <View style={styles.badgeSparkle}>
+                        <Sparkles size={12} color="#fbbf24" />
+                      </View>
+                    )}
+                  </LinearGradient>
+                </Animated.View>
+              ))}
+            </View>
+          </Animated.View>
+
+          {/* Recent Achievements */}
+          <Animated.View
+            style={[
+              styles.achievementsContainer,
+              {
+                opacity: animatedValues.fadeAnim,
+                transform: [{ translateY: animatedValues.slideAnim }],
+              },
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Star size={20} color="#fbbf24" />
+              <Text style={styles.sectionTitle}>Recent Achievements</Text>
+            </View>
+            {achievements.map((achievement, index) => (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.achievementCard,
+                  {
+                    transform: [
+                      {
+                        translateY: animatedValues.slideAnim.interpolate({
+                          inputRange: [0, 30],
+                          outputRange: [0, 15 + index * 5],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                <LinearGradient
+                  colors={[achievement.color + "20", achievement.color + "10"]}
+                  style={styles.achievementCardGradient}
+                >
+                  <View style={[styles.achievementIcon, { backgroundColor: achievement.color + "20" }]}>
+                    <Trophy size={24} color={achievement.color} />
+                  </View>
+                  <View style={styles.achievementContent}>
+                    <Text style={styles.achievementTitle}>
+                      {achievement.title}
+                    </Text>
+                    <Text style={styles.achievementDescription}>
+                      {achievement.description}
+                    </Text>
+                    <Text style={styles.achievementDate}>{achievement.date}</Text>
+                  </View>
+                </LinearGradient>
+              </Animated.View>
+            ))}
+          </Animated.View>
+
+          {/* Settings Section */}
+          <Animated.View
+            style={[
+              styles.settingsContainer,
+              {
+                opacity: animatedValues.fadeAnim,
+                transform: [{ translateY: animatedValues.slideAnim }],
+              },
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Shield size={20} color="#94a3b8" />
+              <Text style={styles.sectionTitle}>Settings</Text>
+            </View>
+
+            {[
+              { icon: Bell, label: "Notifications", color: "#10b981" },
+              { icon: Globe, label: "Language", color: "#6366f1" },
+              { icon: HelpCircle, label: "Help & Support", color: "#8b5cf6", route: "/pages/LearnScreen" },
+              { icon: Info, label: "About", color: "#f59e0b" },
+            ].map((setting, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.settingItem}
+                onPress={() => setting.route && router.push(setting.route)}
+              >
+                <LinearGradient
+                  colors={[setting.color + "20", setting.color + "10"]}
+                  style={styles.settingItemGradient}
+                >
+                  <View style={[styles.settingIcon, { backgroundColor: setting.color + "20" }]}>
+                    <setting.icon size={20} color={setting.color} />
+                  </View>
+                  <Text style={styles.settingText}>{setting.label}</Text>
+                  <Text style={styles.chevron}>›</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity
+              style={[styles.settingItem, styles.logoutItem]}
+              onPress={handleLogout}
+            >
+              <LinearGradient
+                colors={["#ef444420", "#ef444410"]}
+                style={styles.settingItemGradient}
+              >
+                <View style={styles.settingIcon}>
+                  <LogOut size={20} color="#ef4444" />
+                </View>
+                <Text style={[styles.settingText, styles.logoutText]}>
+                  Logout
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    marginBottom: 20,
+  },
+  headerGradient: {
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  avatarContainer: {
+    marginBottom: 16,
+    position: "relative",
+  },
+  avatarWrapper: {
+    position: "relative",
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 12,
+    position: "relative",
+  },
+  avatarGlow: {
+    position: "absolute",
+    top: -4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    borderRadius: 44,
+    backgroundColor: "rgba(99, 102, 241, 0.3)",
+    zIndex: -1,
+  },
+  sparkleOverlay: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  userInfo: {
+    alignItems: "center",
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#ffffff",
+    letterSpacing: -0.3,
+  },
+  levelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(96, 165, 250, 0.2)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  userLevel: {
+    fontSize: 14,
+    color: "#60a5fa",
+    fontWeight: "600",
+  },
+  progressContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  progressCard: {
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  progressHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  progressDetails: {
+    gap: 12,
+  },
+  progressInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  progressText: {
+    fontSize: 16,
+    color: "#ffffff",
+    fontWeight: "600",
+  },
+  progressPercentage: {
+    fontSize: 16,
+    color: "#fbbf24",
+    fontWeight: "700",
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 4,
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#fbbf24",
+    borderRadius: 4,
+  },
+  progressLabel: {
+    fontSize: 14,
+    color: "#94a3b8",
+    textAlign: "center",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#ffffff",
+  },
+  statsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  statCard: {
+    width: "48%",
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  statCardGradient: {
+    padding: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 16,
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#ffffff",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#94a3b8",
+    textAlign: "center",
+    fontWeight: "500",
+  },
+  badgesContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  badgesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  badgeCard: {
+    width: "48%",
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  badgeCardLocked: {
+    opacity: 0.6,
+  },
+  badgeCardGradient: {
+    padding: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 16,
+    position: "relative",
+    minHeight: 120,
+    justifyContent: "center",
+  },
+  badgeIconText: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  badgeName: {
+    fontSize: 12,
+    color: "#ffffff",
+    textAlign: "center",
+    fontWeight: "600",
+    marginTop: 8,
+  },
+  badgeNameLocked: {
+    color: "#6b7280",
+  },
+  badgeSparkle: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+  },
+  achievementsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  achievementCard: {
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  achievementCardGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 16,
+    gap: 16,
+  },
+  achievementIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  achievementContent: {
+    flex: 1,
+  },
+  achievementTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#ffffff",
+    marginBottom: 4,
+  },
+  achievementDescription: {
+    fontSize: 14,
+    color: "#94a3b8",
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+  achievementDate: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  settingsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 30,
+  },
+  settingItem: {
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  settingItemGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 16,
+    gap: 16,
+  },
+  settingIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingText: {
+    flex: 1,
+    fontSize: 16,
+    color: "#ffffff",
+    fontWeight: "500",
+  },
+  chevron: {
+    fontSize: 24,
+    color: "#94a3b8",
+  },
+  logoutItem: {
+    marginTop: 10,
+  },
+  logoutText: {
+    color: "#ef4444",
+  },
+});
+
+export default ProfileScreen;
                   >
                     {badge.name}
                   </Text>

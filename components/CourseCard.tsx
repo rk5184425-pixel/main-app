@@ -5,7 +5,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Animated,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Clock, BookOpen, Star, TrendingUp, Target } from "lucide-react-native";
 import { Course } from "../types/lesson";
 
@@ -44,6 +46,42 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   progress = 0,
   onStartCourse,
 }) => {
+  const [scaleAnim] = React.useState(new Animated.Value(1));
+  const [glowAnim] = React.useState(new Animated.Value(0));
+
+  React.useEffect(() => {
+    if (progress > 0) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 3000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0,
+            duration: 3000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, [progress]);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const getIconComponent = () => {
     switch (course.icon) {
       case "trending-up":
@@ -57,98 +95,169 @@ export const CourseCard: React.FC<CourseCardProps> = ({
     }
   };
 
+  const getCourseGradient = () => {
+    switch (course.color) {
+      case "#3B82F6":
+        return ["#3B82F6", "#1D4ED8"];
+      case "#10B981":
+        return ["#10B981", "#059669"];
+      case "#8B5CF6":
+        return ["#8B5CF6", "#7C3AED"];
+      case "#F59E0B":
+        return ["#F59E0B", "#D97706"];
+      default:
+        return ["#6B7280", "#4B5563"];
+    }
+  };
+
   return (
-    <TouchableOpacity
-      style={[styles.card, { borderLeftColor: course.color }]}
-      onPress={() => onStartCourse(course.id)}
-      activeOpacity={0.95}
+    <Animated.View
+      style={[
+        styles.cardContainer,
+        {
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
     >
-      <View style={styles.header}>
-        <View
-          style={[
-            styles.iconContainer,
-            { backgroundColor: course.color + "15" },
-          ]}
+      <TouchableOpacity
+      onPress={() => onStartCourse(course.id)}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      activeOpacity={0.95}
+        style={styles.touchableCard}
+    >
+        <LinearGradient
+          colors={["#1e293b", "#334155"]}
+          style={styles.card}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         >
-          {getIconComponent()}
-        </View>
-        <View style={styles.headerRight}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              {course.lessons.length} Lessons
-            </Text>
-          </View>
-          <View style={styles.difficultyBadge}>
-            <Text style={styles.difficultyText}>{course.difficulty}</Text>
-          </View>
-        </View>
-      </View>
-
-      <Text style={styles.title}>{course.title}</Text>
-      <Text style={styles.description}>{course.description}</Text>
-
-      <View style={styles.footer}>
-        <View style={styles.metaContainer}>
-          <View style={styles.durationContainer}>
-            <Clock size={16} color={colors.textSecondary} />
-            <Text style={styles.durationText}>
-              {course.totalDuration} min total
-            </Text>
-          </View>
-
-          {course.rating && (
-            <View style={styles.ratingContainer}>
-              <Star size={16} color={colors.accent} />
-              <Text style={styles.ratingText}>{course.rating}</Text>
-            </View>
+          {/* Progress Glow Effect */}
+          {progress > 0 && (
+            <Animated.View
+              style={[
+                styles.progressGlow,
+                {
+                  opacity: glowAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.2, 0.5],
+                  }),
+                  backgroundColor: course.color,
+                },
+              ]}
+            />
           )}
-        </View>
 
-        {progress > 0 && (
-          <View style={styles.progressContainer}>
-            <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>Progress</Text>
-              <Text style={styles.progressPercent}>
-                {Math.round(progress)}%
-              </Text>
-            </View>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${progress}%`, backgroundColor: course.color },
-                ]}
-              />
+          <View style={styles.header}>
+            <LinearGradient
+              colors={getCourseGradient()}
+              style={styles.iconContainer}
+            >
+              {getIconComponent()}
+            </LinearGradient>
+            <View style={styles.headerRight}>
+              <View style={[styles.badge, { backgroundColor: course.color + "20" }]}>
+                <Text style={[styles.badgeText, { color: course.color }]}>
+                  {course.lessons.length} Lessons
+                </Text>
+              </View>
+              <LinearGradient
+                colors={[course.color + "30", course.color + "20"]}
+                style={styles.difficultyBadge}
+              >
+                <Text style={[styles.difficultyText, { color: course.color }]}>
+                  {course.difficulty}
+                </Text>
+              </LinearGradient>
             </View>
           </View>
-        )}
 
-        <View style={[styles.button, { backgroundColor: course.color }]}>
-          <BookOpen size={18} color={colors.white} />
-          <Text style={styles.buttonText}>
-            {progress > 0 ? "Continue Learning" : "Start Course"}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+          <Text style={styles.title}>{course.title}</Text>
+          <Text style={styles.description}>{course.description}</Text>
+
+          <View style={styles.footer}>
+            <View style={styles.metaContainer}>
+              <View style={styles.durationContainer}>
+                <Clock size={16} color="#94a3b8" />
+                <Text style={styles.durationText}>
+                  {course.totalDuration} min total
+                </Text>
+              </View>
+
+              {course.rating && (
+                <View style={styles.ratingContainer}>
+                  <Star size={16} color="#fbbf24" />
+                  <Text style={styles.ratingText}>{course.rating}</Text>
+                </View>
+              )}
+            </View>
+
+            {progress > 0 && (
+              <View style={styles.progressContainer}>
+                <View style={styles.progressHeader}>
+                  <Text style={styles.progressLabel}>Progress</Text>
+                  <Text style={styles.progressPercent}>
+                    {Math.round(progress)}%
+                  </Text>
+                </View>
+                <View style={styles.progressBar}>
+                  <Animated.View
+                    style={[
+                      styles.progressFill,
+                      {
+                        width: `${progress}%`,
+                        backgroundColor: course.color,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
+            )}
+
+            <LinearGradient
+              colors={getCourseGradient()}
+              style={styles.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <BookOpen size={18} color="#ffffff" />
+              <Text style={styles.buttonText}>
+                {progress > 0 ? "Continue Learning" : "Start Course"}
+              </Text>
+            </LinearGradient>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 20,
+  cardContainer: {
     marginBottom: 16,
-    width: width * 0.85,
-    alignSelf: "center",
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
-    borderLeftWidth: 4,
-    transform: [{ scale: 1 }],
+  },
+  touchableCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  card: {
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    position: "relative",
+    overflow: "hidden",
+  },
+  progressGlow: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   header: {
     flexDirection: "row",
@@ -162,44 +271,49 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   headerRight: {
     alignItems: "flex-end",
     gap: 8,
   },
   badge: {
-    backgroundColor: colors.gray[100],
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   badgeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: colors.textSecondary,
   },
   difficultyBadge: {
-    backgroundColor: colors.primary + "15",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   difficultyText: {
     fontSize: 11,
     fontWeight: "600",
-    color: colors.primary,
     textTransform: "uppercase",
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: colors.text,
+    color: "#ffffff",
     marginBottom: 8,
     lineHeight: 28,
   },
   description: {
     fontSize: 15,
-    color: colors.textSecondary,
+    color: "#94a3b8",
     lineHeight: 22,
     marginBottom: 20,
   },
@@ -215,7 +329,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: colors.gray[50],
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -223,7 +337,7 @@ const styles = StyleSheet.create({
   durationText: {
     fontSize: 13,
     fontWeight: "600",
-    color: colors.text,
+    color: "#e2e8f0",
   },
   ratingContainer: {
     flexDirection: "row",
@@ -233,12 +347,14 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.text,
+    color: "#ffffff",
   },
   progressContainer: {
-    backgroundColor: colors.gray[50],
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     padding: 16,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   progressHeader: {
     flexDirection: "row",
@@ -249,16 +365,16 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: "#94a3b8",
   },
   progressPercent: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.primary,
+    color: "#60a5fa",
   },
   progressBar: {
     height: 8,
-    backgroundColor: colors.gray[200],
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 4,
     overflow: "hidden",
   },
@@ -273,15 +389,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 16,
     borderRadius: 12,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: colors.white,
+    color: "#ffffff",
   },
 });
